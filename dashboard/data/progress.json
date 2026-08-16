@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-16T15:26:03Z",
+  "updated": "2026-08-16T15:49:51Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -43,12 +43,12 @@
     {
       "id": "tmux",
       "title": "tmux",
-      "status": "in-progress",
+      "status": "done",
       "summary": "Sane, boring, widely-recognized tmux config: sensible defaults, mouse on, readable status line, session persistence.",
       "steps": [
         { "label": "Write ~/.config/tmux/tmux.conf (managed by chezmoi)", "status": "done" },
         { "label": "Install tpm + tmux-sensible, tmux-resurrect, tmux-continuum", "status": "done" },
-        { "label": "Verify session survives detach/reattach and reboot (continuum)", "status": "todo" }
+        { "label": "Verify session survives detach/reattach and reboot (continuum)", "status": "done" }
       ]
     },
     {
@@ -115,6 +115,7 @@
     { "title": "chezmoi over stow/plain script", "why": "Needs to reconcile real Linux/macOS differences (paths, package managers) across two hosts with one source of truth." },
     { "title": "Git commit email is GitHub's noreply address", "why": "Standard privacy practice — keeps the real iCloud address out of public commit metadata." },
     { "title": "droppdd starts as a Next.js web app", "why": "Fastest path to something usable on a phone browser today; mobile app shell can wrap it later if needed." },
-    { "title": "MagicDNS short hostname deferred", "why": "Would need a systemd-resolved/NetworkManager fix, and Tailscale's auto-cert only covers the full .ts.net name anyway, so a short name would break HTTPS. Not worth it yet — full URL works fine." }
+    { "title": "MagicDNS short hostname deferred", "why": "Would need a systemd-resolved/NetworkManager fix, and Tailscale's auto-cert only covers the full .ts.net name anyway, so a short name would break HTTPS. Not worth it yet — full URL works fine." },
+    { "title": "Reboot verification confirmed full auto-recovery", "why": "Rebooted box and checked the dashboard service, tailscale serve, and tmux-continuum boot-restore against docs/POST-REBOOT-CHECKLIST.md — all came back with zero manual steps, closing out the tmux phase." }
   ]
 }

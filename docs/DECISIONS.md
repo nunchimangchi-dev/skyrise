@@ -39,3 +39,11 @@ by design.
 
 Fastest path to something usable on a phone browser today. A native/Expo shell
 can wrap it later if an installable app turns out to matter.
+
+## Reboot verification confirmed, not just assumed
+
+Rebooted `box` and walked `docs/POST-REBOOT-CHECKLIST.md` line by line: the
+dashboard systemd --user service, tailscale serve, and tmux-continuum's
+boot-restore of the pre-reboot `main` session (two windows, correct cwds) all
+came back with zero manual intervention. Persistence claims don't count until
+they've survived an actual reboot, not just a detach/reattach.
