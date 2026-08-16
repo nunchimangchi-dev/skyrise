@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-16T15:09:30Z",
+  "updated": "2026-08-16T15:09:51Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -77,12 +77,12 @@
     {
       "id": "dotfiles",
       "title": "chezmoi dotfiles",
-      "status": "in-progress",
+      "status": "done",
       "summary": "One source of truth for fish/tmux config, applied identically on box and the MacBook.",
       "steps": [
         { "label": "chezmoi source dir symlinked to dotfiles/ and applied", "status": "done" },
         { "label": "Add managed files (fish, tmux)", "status": "done" },
-        { "label": "Push to skyrise repo", "status": "todo" },
+        { "label": "Push to skyrise repo", "status": "done" },
         { "label": "Document `chezmoi init --apply` bootstrap for a brand-new host", "status": "done" }
       ]
     },
