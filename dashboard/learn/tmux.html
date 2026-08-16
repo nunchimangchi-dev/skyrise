@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tmux — skyrise</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap learn-page">
+  <a class="back-link" href="../index.html#learn">&larr; Back to dashboard</a>
+  <h1>tmux</h1>
+  <p class="tagline">A terminal that keeps running even after you leave.</p>
+
+  <div class="learn-section">
+    <h2>What it is</h2>
+    <p>
+      tmux is a "terminal multiplexer" — it lets one terminal window hold
+      multiple independent sessions, windows, and split panes, and keeps them
+      all alive in the background even after you close the window or lose the
+      connection.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>Why it's here</h2>
+    <p>
+      <code>box</code> is a server you connect to remotely, not a laptop
+      sitting on your desk. Without tmux, closing the terminal or losing SSH
+      would kill anything running in it. With it — plus the
+      <code>tmux-resurrect</code> and <code>tmux-continuum</code> plugins —
+      sessions survive a disconnect <i>and</i> a full reboot, restoring
+      automatically via a systemd --user service.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>What you'll use it for</h2>
+    <p>
+      Reattaching to work in progress after closing a laptop lid or losing
+      wifi (<code>tmux attach -t main</code>), and running a long-lived
+      process — like droppdd's dev server — in one window while editing files
+      in another, without either one depending on the other staying open.
+    </p>
+  </div>
+</div>
+</body>
+</html>

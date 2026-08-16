@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bitwarden + CLI — skyrise</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap learn-page">
+  <a class="back-link" href="../index.html#learn">&larr; Back to dashboard</a>
+  <h1>Bitwarden + Bitwarden CLI</h1>
+  <p class="tagline">Where passwords and secrets live — never in git.</p>
+
+  <div class="learn-section">
+    <h2>What it is</h2>
+    <p>
+      Bitwarden is a password manager: an encrypted vault for passwords, API
+      keys, and other secrets. The <b>Bitwarden CLI</b> (<code>bw</code>) is a
+      command-line tool that can read from that same vault from a terminal or
+      a script, once unlocked by a human.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>Why it's here</h2>
+    <p>
+      This whole setup follows one rule: no secrets in git, ever. But scripts
+      and tools still occasionally need a real credential. Bitwarden CLI is
+      the bridge — <code>bw login</code> is always run by a human typing the
+      master password, never stored or scripted, so a compromised script can
+      never silently drain the vault.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>What you'll use it for</h2>
+    <p>
+      Pulling a specific secret into a script's environment at runtime
+      (<code>bw get item ...</code>) instead of hardcoding it, and as the
+      one place API keys, tokens, and passwords for future projects (like
+      droppdd's eventual AI meal-planning API key) get stored.
+    </p>
+  </div>
+</div>
+</body>
+</html>

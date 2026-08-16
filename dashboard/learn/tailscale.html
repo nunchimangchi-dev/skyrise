@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tailscale — skyrise</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap learn-page">
+  <a class="back-link" href="../index.html#learn">&larr; Back to dashboard</a>
+  <h1>Tailscale</h1>
+  <p class="tagline">A private network between your own devices — this dashboard's front door.</p>
+
+  <div class="learn-section">
+    <h2>What it is</h2>
+    <p>
+      Tailscale creates a private mesh network (a "tailnet") between your own
+      devices — this box, a MacBook, a phone — giving each one a stable
+      private address it can reach the others by, without opening anything
+      up to the public internet. <code>tailscale serve</code> takes it a step
+      further: it can publish a service running on one device (like this
+      dashboard on <code>localhost:8787</code>) to the rest of the tailnet
+      over HTTPS, still private.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>Why it's here</h2>
+    <p>
+      This dashboard needed to be viewable from a phone or the MacBook, but
+      it's a personal build log with no reason to be public. Tailscale was
+      chosen over something like a Cloudflare Tunnel specifically because the
+      audience is "just my own devices" — that's what a tailnet is for. It's
+      served at <code>https://box.tail2b3f17.ts.net/</code>, reachable only
+      from devices signed into the same tailnet.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>What you'll use it for</h2>
+    <p>
+      Checking this dashboard from a phone or the MacBook without a VPN
+      client or exposing anything to the internet. The same pattern
+      (systemd --user service + <code>tailscale serve</code>) is the template
+      for privately sharing any other future local service — like droppdd's
+      dev server — the same way.
+    </p>
+  </div>
+</div>
+</body>
+</html>

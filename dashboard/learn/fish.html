@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fish shell — skyrise</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap learn-page">
+  <a class="back-link" href="../index.html#learn">&larr; Back to dashboard</a>
+  <h1>Fish shell</h1>
+  <p class="tagline">The program that reads and runs the commands you type.</p>
+
+  <div class="learn-section">
+    <h2>What it is</h2>
+    <p>
+      A shell is the program behind every terminal prompt — it's what turns
+      typed commands like <code>ls</code> or <code>git push</code> into
+      actions. Fish is one option (alongside bash or zsh), built around
+      sensible defaults out of the box: syntax highlighting, autosuggestions
+      from history, and readable tab completion.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>Why it's here</h2>
+    <p>
+      Fish is now the default login shell on <code>box</code>
+      (<code>chsh -s /usr/bin/fish</code>), with <code>fisher</code> as its
+      plugin manager and two small, standard plugins added:
+      <code>fzf.fish</code> for fuzzy searching and <code>zoxide</code> for
+      jumping between directories by memory instead of full paths.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>What you'll use it for</h2>
+    <p>
+      Literally every terminal session on this box. Day to day that means
+      faster navigation (<code>z projects</code> instead of
+      <code>cd ~/Projects</code>), fuzzy history/file search via fzf
+      keybindings, and autosuggested commands as you type.
+    </p>
+  </div>
+</div>
+</body>
+</html>

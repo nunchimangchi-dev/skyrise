@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>droppdd — skyrise</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap learn-page">
+  <a class="back-link" href="../index.html#learn">&larr; Back to dashboard</a>
+  <h1>droppdd</h1>
+  <p class="tagline">Not a tool this setup depends on — the first real project built with it.</p>
+
+  <div class="learn-section">
+    <h2>What it is</h2>
+    <p>
+      droppdd is a fitness/coaching web app (keto, OMAD, guided workouts, AI
+      meal planning), built as a Next.js project. Unlike every other entry in
+      this dashboard, it isn't infrastructure — it's the thing all the
+      infrastructure exists to support.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>Why it's here</h2>
+    <p>
+      Every tool above (git/GitHub, tmux, fish, Bitwarden, chezmoi,
+      Tailscale) can look fine in isolation and still fail once something
+      real is built on top of it. droppdd was scaffolded specifically to
+      stress-test the whole toolchain end to end — new repo, SSH push, CI
+      lint workflow, running its dev server inside a tmux window — instead of
+      taking it on faith.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>What you'll use it for</h2>
+    <p>
+      This is where day-to-day development work actually happens going
+      forward. Its dev server runs in the <code>droppdd</code> tmux window
+      (see the tmux page), it's pushed to GitHub the same way as skyrise, and
+      any future secret it needs (like an AI API key) comes out of Bitwarden,
+      never committed.
+    </p>
+  </div>
+</div>
+</body>
+</html>

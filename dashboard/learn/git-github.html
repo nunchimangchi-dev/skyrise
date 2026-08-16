@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Git + GitHub — skyrise</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap learn-page">
+  <a class="back-link" href="../index.html#learn">&larr; Back to dashboard</a>
+  <h1>Git + GitHub</h1>
+  <p class="tagline">Version control for the code, and a remote home for it.</p>
+
+  <div class="learn-section">
+    <h2>What it is</h2>
+    <p>
+      <b>Git</b> is the tool that tracks every change to a project's files over
+      time — every save is a "commit" with a record of exactly what changed and
+      why. <b>GitHub</b> is a website that hosts a copy of that history online,
+      so it's backed up and other people (or other machines) can pull it down.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>Why it's here</h2>
+    <p>
+      Every project in this setup — skyrise itself, and droppdd — lives in git
+      and is pushed to GitHub. An SSH key was generated for this host and
+      registered with GitHub so pushing and pulling never asks for a password.
+      The commit email is set to GitHub's private noreply address, so the
+      real inbox never ends up in public commit history.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>What you'll use it for</h2>
+    <p>
+      Every time work is saved in a project: <code>git add</code>,
+      <code>git commit</code>, <code>git push</code>. On a new host, cloning a
+      repo with <code>git clone</code> just works, no login prompt. Going
+      forward, this is also how droppdd (and any future project) gets a
+      history, backups, and eventually pull requests and CI.
+    </p>
+  </div>
+</div>
+</body>
+</html>

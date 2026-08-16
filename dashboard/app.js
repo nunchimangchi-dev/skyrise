@@ -109,6 +109,18 @@ function render(data) {
   );
   (firstOpen || document.querySelector(".phase-card"))?.classList.add("open");
 
+  document.querySelector(".learn-list").innerHTML = phases
+    .filter((p) => p.learn)
+    .map(
+      (p) => `
+      <a class="learn-card" href="${p.learn}">
+        <div class="learn-title">${p.title}</div>
+        <p class="learn-summary">${p.summary}</p>
+        <span class="learn-link">What is this, and why? &rarr;</span>
+      </a>`
+    )
+    .join("");
+
   document.querySelector(".decisions").innerHTML = decisions
     .map(
       (d) => `

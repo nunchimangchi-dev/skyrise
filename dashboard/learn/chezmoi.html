@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>chezmoi — skyrise</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="wrap learn-page">
+  <a class="back-link" href="../index.html#learn">&larr; Back to dashboard</a>
+  <h1>chezmoi</h1>
+  <p class="tagline">One source of truth for config files, across every machine.</p>
+
+  <div class="learn-section">
+    <h2>What it is</h2>
+    <p>
+      "Dotfiles" are the config files behind your tools — fish's
+      <code>config.fish</code>, tmux's <code>tmux.conf</code>, git's global
+      config — named with a leading dot so they're normally hidden.
+      chezmoi manages a single source copy of these files (in
+      <code>skyrise/dotfiles/</code>) and applies it out to wherever it needs
+      to actually live on a given machine, adjusting for differences between
+      machines along the way.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>Why it's here</h2>
+    <p>
+      There are two hosts in play: <code>box</code> (Linux) and a MacBook.
+      They don't have identical file layouts or package managers, so plain
+      symlinking wasn't enough — chezmoi was chosen over simpler options
+      (like GNU stow) specifically because it can template around those
+      differences from one repo instead of hand-maintaining two sets of
+      configs.
+    </p>
+  </div>
+
+  <div class="learn-section">
+    <h2>What you'll use it for</h2>
+    <p>
+      Editing a config once and rolling it out everywhere: change
+      <code>dotfiles/</code> in the skyrise repo, then run
+      <code>chezmoi apply</code> on each host to sync it. Bootstrapping a
+      brand-new machine is a single command:
+    </p>
+    <pre>chezmoi init --apply --source ~/Projects/skyrise/dotfiles</pre>
+  </div>
+</div>
+</body>
+</html>

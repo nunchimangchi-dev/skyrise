@@ -85,6 +85,31 @@ header.top p {
   text-align: right;
 }
 
+.tab-nav {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--gridline);
+  padding-bottom: 10px;
+}
+
+.tab-nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tab-nav a:hover {
+  color: var(--series-blue);
+}
+
+.section-intro {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: -6px 0 14px;
+}
+
 .stat-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -250,6 +275,44 @@ h2.section-title {
   flex: none;
 }
 
+.learn-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.learn-card {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.learn-card:hover {
+  border-color: var(--series-blue);
+}
+
+.learn-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.learn-summary {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  margin: 6px 0 10px;
+}
+
+.learn-link {
+  color: var(--series-blue);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .decisions {
   display: flex;
   flex-direction: column;
@@ -288,3 +351,66 @@ footer.foot {
 }
 
 a { color: var(--series-blue); }
+
+/* Learn pages (dashboard/learn/*.html) */
+
+.back-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  text-decoration: none;
+}
+
+.learn-page h1 {
+  font-size: 1.5rem;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.learn-page .tagline {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 28px;
+}
+
+.learn-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+
+.learn-section h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin: 0 0 8px;
+}
+
+.learn-section p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.94rem;
+}
+
+.learn-section p + p {
+  margin-top: 10px;
+}
+
+.learn-section code {
+  background: var(--surface-2);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.88em;
+}
+
+.learn-section pre {
+  background: var(--surface-2);
+  border-radius: 7px;
+  padding: 10px 14px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  margin: 8px 0 0;
+}

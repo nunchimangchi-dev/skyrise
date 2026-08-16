@@ -31,6 +31,7 @@
       "title": "Git + GitHub",
       "status": "done",
       "summary": "Local git identity, SSH key, and GitHub CLI auth so every host can push/pull without passwords.",
+      "learn": "learn/git-github.html",
       "steps": [
         { "label": "Set global git identity (noreply email for privacy)", "status": "done" },
         { "label": "Generate per-host ed25519 SSH key", "status": "done" },
@@ -45,6 +46,7 @@
       "title": "tmux",
       "status": "done",
       "summary": "Sane, boring, widely-recognized tmux config: sensible defaults, mouse on, readable status line, session persistence.",
+      "learn": "learn/tmux.html",
       "steps": [
         { "label": "Write ~/.config/tmux/tmux.conf (managed by chezmoi)", "status": "done" },
         { "label": "Install tpm + tmux-sensible, tmux-resurrect, tmux-continuum", "status": "done" },
@@ -56,6 +58,7 @@
       "title": "Fish shell",
       "status": "done",
       "summary": "Fish as the default interactive shell, kept close to CachyOS defaults plus a small, standard plugin set via fisher.",
+      "learn": "learn/fish.html",
       "steps": [
         { "label": "chsh -s /usr/bin/fish", "status": "done" },
         { "label": "Install fisher", "status": "done" },
@@ -68,6 +71,7 @@
       "title": "Bitwarden + Bitwarden CLI",
       "status": "done",
       "summary": "Vault access from the terminal for secrets (never stored in git).",
+      "learn": "learn/bitwarden.html",
       "steps": [
         { "label": "Install bitwarden-cli (bw)", "status": "done" },
         { "label": "bw login (user-driven, master password)", "status": "done" },
@@ -79,6 +83,7 @@
       "title": "chezmoi dotfiles",
       "status": "done",
       "summary": "One source of truth for fish/tmux config, applied identically on box and the MacBook.",
+      "learn": "learn/chezmoi.html",
       "steps": [
         { "label": "chezmoi source dir symlinked to dotfiles/ and applied", "status": "done" },
         { "label": "Add managed files (fish, tmux)", "status": "done" },
@@ -91,6 +96,7 @@
       "title": "Dashboard hosting (Tailscale)",
       "status": "done",
       "summary": "Serve this dashboard privately over the tailnet — reachable from box and the MacBook, never public. Live at https://box.tail2b3f17.ts.net/",
+      "learn": "learn/tailscale.html",
       "steps": [
         { "label": "systemd --user unit serving dashboard/ over localhost (+ linger enabled)", "status": "done" },
         { "label": "tailscale serve to publish it on the tailnet only", "status": "done" },
@@ -102,6 +108,7 @@
       "title": "droppdd (validation project)",
       "status": "done",
       "summary": "Aggressive fitness/coaching app (keto, OMAD, guided workouts, AI meal planning) — scaffolded using everything above, proving the toolchain end to end. github.com/nunchimangchi-dev/droppdd",
+      "learn": "learn/droppdd.html",
       "steps": [
         { "label": "Create ~/Projects/droppdd via the documented process", "status": "done" },
         { "label": "Next.js scaffold + repo + CI lint workflow", "status": "done" },
