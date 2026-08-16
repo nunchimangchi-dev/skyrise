@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-16T14:54:10Z",
+  "updated": "2026-08-16T15:09:30Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -43,47 +43,47 @@
     {
       "id": "tmux",
       "title": "tmux",
-      "status": "todo",
+      "status": "in-progress",
       "summary": "Sane, boring, widely-recognized tmux config: sensible defaults, mouse on, readable status line, session persistence.",
       "steps": [
-        { "label": "Write ~/.config/tmux/tmux.conf (managed by chezmoi)", "status": "todo" },
-        { "label": "Install tpm + tmux-sensible, tmux-resurrect, tmux-continuum", "status": "todo" },
+        { "label": "Write ~/.config/tmux/tmux.conf (managed by chezmoi)", "status": "done" },
+        { "label": "Install tpm + tmux-sensible, tmux-resurrect, tmux-continuum", "status": "done" },
         { "label": "Verify session survives detach/reattach and reboot (continuum)", "status": "todo" }
       ]
     },
     {
       "id": "fish",
       "title": "Fish shell",
-      "status": "todo",
+      "status": "in-progress",
       "summary": "Fish as the default interactive shell, kept close to CachyOS defaults plus a small, standard plugin set via fisher.",
       "steps": [
-        { "label": "chsh -s /usr/bin/fish", "status": "todo" },
-        { "label": "Install fisher", "status": "todo" },
-        { "label": "Add fzf.fish + zoxide integration (standard, not exotic)", "status": "todo" },
-        { "label": "Move config.fish under chezmoi management", "status": "todo" }
+        { "label": "chsh -s /usr/bin/fish", "status": "done" },
+        { "label": "Install fisher", "status": "done" },
+        { "label": "Add fzf.fish (done) + zoxide (pending sudo, locked out by faillock)", "status": "in-progress" },
+        { "label": "Move config.fish under chezmoi management", "status": "done" }
       ]
     },
     {
       "id": "bitwarden",
       "title": "Bitwarden + Bitwarden CLI",
-      "status": "todo",
+      "status": "done",
       "summary": "Vault access from the terminal for secrets (never stored in git).",
       "steps": [
-        { "label": "Install bitwarden-cli (bw)", "status": "todo" },
-        { "label": "bw login (user-driven, master password)", "status": "todo" },
-        { "label": "Document unlock/session pattern for scripts", "status": "todo" }
+        { "label": "Install bitwarden-cli (bw)", "status": "done" },
+        { "label": "bw login (user-driven, master password)", "status": "done" },
+        { "label": "Document unlock/session pattern for scripts", "status": "done" }
       ]
     },
     {
       "id": "dotfiles",
       "title": "chezmoi dotfiles",
-      "status": "todo",
-      "summary": "One source of truth for fish/tmux/git config, applied identically on box and the MacBook.",
+      "status": "in-progress",
+      "summary": "One source of truth for fish/tmux config, applied identically on box and the MacBook.",
       "steps": [
-        { "label": "chezmoi init with dotfiles/ as source", "status": "todo" },
-        { "label": "Add managed files (fish, tmux, gitconfig template)", "status": "todo" },
+        { "label": "chezmoi source dir symlinked to dotfiles/ and applied", "status": "done" },
+        { "label": "Add managed files (fish, tmux)", "status": "done" },
         { "label": "Push to skyrise repo", "status": "todo" },
-        { "label": "Document `chezmoi init --apply` bootstrap for a brand-new host", "status": "todo" }
+        { "label": "Document `chezmoi init --apply` bootstrap for a brand-new host", "status": "done" }
       ]
     },
     {

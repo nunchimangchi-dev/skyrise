@@ -10,6 +10,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 ./scripts/install/00-packages.sh
 ./scripts/install/10-git-github.sh
+./scripts/install/15-dotfiles.sh
+./scripts/install/20-tmux.sh
+./scripts/install/30-fish.sh
+./scripts/install/40-bitwarden.sh
 
 echo
 echo "==> Bootstrap steps run so far. Check the dashboard or README for what's next."
