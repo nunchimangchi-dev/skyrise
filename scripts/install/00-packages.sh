@@ -5,7 +5,7 @@ set -euo pipefail
 
 if command -v pacman >/dev/null 2>&1; then
   echo "==> Arch/CachyOS: installing via pacman (needs sudo)"
-  sudo pacman -S --needed git github-cli tmux fish fisher bitwarden-cli chezmoi fzf zoxide
+  sudo pacman -S --needed git github-cli tmux fish fisher bitwarden-cli chezmoi fzf zoxide nodejs-lts-jod npm
 elif command -v brew >/dev/null 2>&1; then
   echo "==> macOS: installing via Homebrew"
   brew install git gh tmux fish bitwarden-cli chezmoi fzf zoxide
