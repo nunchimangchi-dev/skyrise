@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-16T14:48:10Z",
+  "updated": "2026-08-16T14:54:10Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -29,15 +29,15 @@
     {
       "id": "git-github",
       "title": "Git + GitHub",
-      "status": "in-progress",
+      "status": "done",
       "summary": "Local git identity, SSH key, and GitHub CLI auth so every host can push/pull without passwords.",
       "steps": [
         { "label": "Set global git identity (noreply email for privacy)", "status": "done" },
         { "label": "Generate per-host ed25519 SSH key", "status": "done" },
         { "label": "Install GitHub CLI (gh)", "status": "done" },
-        { "label": "gh auth login (browser OAuth, user-driven)", "status": "todo" },
-        { "label": "Register SSH key with GitHub via gh", "status": "todo" },
-        { "label": "Create + push skyrise repo (public)", "status": "todo" }
+        { "label": "gh auth login (browser OAuth, user-driven)", "status": "done" },
+        { "label": "Register SSH key with GitHub via gh", "status": "done" },
+        { "label": "Create + push skyrise repo (public)", "status": "done" }
       ]
     },
     {
