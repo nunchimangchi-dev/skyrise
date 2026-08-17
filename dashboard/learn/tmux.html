@@ -43,6 +43,28 @@
       in another, without either one depending on the other staying open.
     </p>
   </div>
+
+  <div class="learn-section">
+    <h2>Cheat sheet</h2>
+    <pre><code># Start a new named session
+tmux new -s main
+
+# Reattach to an existing session
+tmux attach -t main
+
+# List running sessions
+tmux ls
+
+# Detach without killing it (default prefix is Ctrl-b)
+&lt;prefix&gt; d
+
+# Split panes
+&lt;prefix&gt; "     # horizontal split
+&lt;prefix&gt; %     # vertical split
+
+# Kill a session entirely
+tmux kill-session -t main</code></pre>
+  </div>
 </div>
 </body>
 </html>

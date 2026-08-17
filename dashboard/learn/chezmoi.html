@@ -47,6 +47,24 @@
     </p>
     <pre>chezmoi init --apply --source ~/Projects/skyrise/dotfiles</pre>
   </div>
+
+  <div class="learn-section">
+    <h2>Cheat sheet</h2>
+    <pre><code># Edit a managed file (opens the source, not the live copy)
+chezmoi edit ~/.config/fish/config.fish
+
+# Preview what would change before applying
+chezmoi diff
+
+# Apply the source state to this machine
+chezmoi apply
+
+# Start tracking a new file
+chezmoi add ~/.gitconfig
+
+# Bootstrap a brand-new machine
+chezmoi init --apply --source ~/Projects/skyrise/dotfiles</code></pre>
+  </div>
 </div>
 </body>
 </html>

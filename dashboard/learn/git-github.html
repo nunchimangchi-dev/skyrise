@@ -43,6 +43,26 @@
       history, backups, and eventually pull requests and CI.
     </p>
   </div>
+
+  <div class="learn-section">
+    <h2>Cheat sheet</h2>
+    <pre><code># Save and push a change
+git add -A
+git commit -m "message"
+git push
+
+# Start a new feature branch
+git checkout -b feat/thing
+
+# Open a PR from the current branch
+gh pr create --title "..." --body "..."
+
+# Check GitHub auth status
+gh auth status
+
+# Clone a repo over SSH (no password prompt)
+git clone git@github.com:user/repo.git</code></pre>
+  </div>
 </div>
 </body>
 </html>

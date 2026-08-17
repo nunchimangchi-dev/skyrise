@@ -29,8 +29,43 @@ function countSteps(phases) {
   return { done, total };
 }
 
+function phaseCardHTML(p, i) {
+  const stepsDone = p.steps.filter((s) => s.status === "done").length;
+  return `
+  <div class="phase-card" data-idx="${i}">
+    <div class="phase-head">
+      <div class="phase-head-left">
+        <span class="chevron">&#9656;</span>
+        <div>
+          <div class="phase-title">${p.title}</div>
+          <p class="phase-summary">${p.summary}</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:0.78rem;color:var(--text-muted);">${stepsDone}/${p.steps.length}</span>
+        ${badge(p.status)}
+      </div>
+    </div>
+    <ul class="step-list">
+      ${p.steps
+        .map(
+          (s) =>
+            `<li class="${s.status === "done" ? "done" : ""}">${
+              s.status === "done" ? "&#10003;" : "&#9675;"
+            } ${s.label}</li>`
+        )
+        .join("")}
+      ${
+        p.pr
+          ? `<li><a href="${p.pr}" target="_blank" rel="noopener">View PR &rarr;</a></li>`
+          : ""
+      }
+    </ul>
+  </div>`;
+}
+
 function render(data) {
-  const { meta, hosts, phases, decisions, updated } = data;
+  const { meta, hosts, phases, decisions, updated, droppdd } = data;
   const { done, total } = countSteps(phases);
   const pct = total ? Math.round((done / total) * 100) : 0;
   const phasesDone = phases.filter((p) => p.status === "done").length;
@@ -67,36 +102,17 @@ function render(data) {
     .join("");
 
   document.querySelector(".phase-list").innerHTML = phases
-    .map((p, i) => {
-      const stepsDone = p.steps.filter((s) => s.status === "done").length;
-      return `
-      <div class="phase-card" data-idx="${i}">
-        <div class="phase-head">
-          <div class="phase-head-left">
-            <span class="chevron">&#9656;</span>
-            <div>
-              <div class="phase-title">${p.title}</div>
-              <p class="phase-summary">${p.summary}</p>
-            </div>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:0.78rem;color:var(--text-muted);">${stepsDone}/${p.steps.length}</span>
-            ${badge(p.status)}
-          </div>
-        </div>
-        <ul class="step-list">
-          ${p.steps
-            .map(
-              (s) =>
-                `<li class="${s.status === "done" ? "done" : ""}">${
-                  s.status === "done" ? "&#10003;" : "&#9675;"
-                } ${s.label}</li>`
-            )
-            .join("")}
-        </ul>
-      </div>`;
-    })
+    .map((p, i) => phaseCardHTML(p, i))
     .join("");
+
+  if (droppdd) {
+    document.querySelector(".droppdd-phase-list").innerHTML = droppdd.phases
+      .map((p, i) => phaseCardHTML(p, `droppdd-${i}`))
+      .join("");
+    const droppddRepoLink = document.querySelector("#droppdd-repo-link");
+    droppddRepoLink.href = droppdd.repo;
+    droppddRepoLink.textContent = droppdd.repo.replace("https://", "");
+  }
 
   document.querySelectorAll(".phase-card").forEach((card) => {
     card.querySelector(".phase-head").addEventListener("click", () => {

@@ -47,6 +47,27 @@
       dev server — the same way.
     </p>
   </div>
+
+  <div class="learn-section">
+    <h2>Cheat sheet</h2>
+    <pre><code># Check this device's status and tailnet peers
+tailscale status
+
+# Get this device's tailnet IP
+tailscale ip -4
+
+# Publish a local port over the tailnet (HTTPS, port 443)
+tailscale serve --bg 8787
+
+# See what's currently being served
+tailscale serve status
+
+# Stop serving / clear all serve config
+tailscale serve reset
+
+# (Re)authenticate this device
+sudo tailscale up</code></pre>
+  </div>
 </div>
 </body>
 </html>

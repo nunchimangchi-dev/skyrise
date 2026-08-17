@@ -42,6 +42,25 @@
       droppdd's eventual AI meal-planning API key) get stored.
     </p>
   </div>
+
+  <div class="learn-section">
+    <h2>Cheat sheet</h2>
+    <pre><code># Unlock the vault - prompts for the master password,
+# prints a session key (nothing readable is echoed)
+bw unlock --raw
+
+# Pull the latest vault state
+bw sync
+
+# Find an item by name
+bw list items --search "some name"
+
+# Get a secure note's full contents (needs the session key)
+bw get item "exact item name"
+
+# Lock the vault again when done
+bw lock</code></pre>
+  </div>
 </div>
 </body>
 </html>

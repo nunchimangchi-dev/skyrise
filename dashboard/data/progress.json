@@ -116,6 +116,72 @@
       ]
     }
   ],
+  "droppdd": {
+    "repo": "https://github.com/nunchimangchi-dev/droppdd",
+    "phases": [
+      {
+        "id": "app-shell-data-layer",
+        "title": "App shell + Prisma/SQLite data layer",
+        "status": "done",
+        "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/1",
+        "summary": "Persistent nav, dashboard, workouts, meals, and progress pages - built on mock data first, then migrated onto a real Prisma/SQLite database.",
+        "steps": [
+          { "label": "App shell built via Gemini CLI (mock data, 4 pages + workout tracker)", "status": "done" },
+          { "label": "Migrated to Prisma + SQLite via Gemini CLI", "status": "done" },
+          { "label": "Fixed a .gitignore bug that would've committed the generated Prisma client", "status": "done" },
+          { "label": "Fixed CI (postinstall prisma generate, migrate deploy + seed steps)", "status": "done" },
+          { "label": "PR #1 merged to main", "status": "done" }
+        ]
+      },
+      {
+        "id": "auth",
+        "title": "Google OAuth + allowlist",
+        "status": "done",
+        "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/2",
+        "summary": "Google-only sign-in via Auth.js v5, gated by an allowlist table - every route protected except the sign-in page itself.",
+        "steps": [
+          { "label": "Auth.js v5 + Prisma adapter (implemented directly - gemini's headless mode couldn't run shell/file tools)", "status": "done" },
+          { "label": "AllowedEmail table gates who can actually sign in", "status": "done" },
+          { "label": "proxy.ts protects every route (Next 16 renamed middleware.js to proxy.js)", "status": "done" },
+          { "label": "Fixed CI (stale @prisma/client type-export bug, same failure class as the data layer)", "status": "done" },
+          { "label": "Real end-to-end Google sign-in verified live; fixed a redirect_uri_mismatch behind tailscale serve", "status": "done" },
+          { "label": "PR #2 merged to main", "status": "done" }
+        ]
+      },
+      {
+        "id": "design-pass",
+        "title": "Cosmetic design pass",
+        "status": "in-progress",
+        "summary": "Mobile bottom nav got crowded once sign-out landed there as a 5th item; /signin is bare. Cosmetic only, no logic changes.",
+        "steps": [
+          { "label": "Prompt drafted (docs/GEMINI-DESIGN-PASS-PROMPT.md)", "status": "done" },
+          { "label": "Run via gemini interactively, /model set to avoid quota-capped models", "status": "todo" }
+        ]
+      },
+      {
+        "id": "wagers",
+        "title": "Wagers / commitment contracts",
+        "status": "todo",
+        "summary": "Put your \"money\" where your mouth is - wager against yourself (or eventually another user) on a fitness goal. Honor system first; real money + charity payouts is the end state.",
+        "steps": [
+          { "label": "Roadmap + legal/safety constraints written up (docs/FUTURE-WAGERS.md)", "status": "done" },
+          { "label": "Phase 1: solo commitment contracts, honor system, no money", "status": "todo" },
+          { "label": "Phase 2: peer wagers, still no money", "status": "todo" },
+          { "label": "Phase 3: real money, solo only (legal review required first)", "status": "todo" }
+        ]
+      },
+      {
+        "id": "ai-meal-planning",
+        "title": "AI-assisted meal planning",
+        "status": "todo",
+        "summary": "The \"AI meal planning - coming soon\" card on the Meals page is still just a placeholder.",
+        "steps": [
+          { "label": "Pick an API (Gemini API, per the original plan - saves Claude usage for coding work)", "status": "todo" },
+          { "label": "Implement generation + wire up the placeholder card", "status": "todo" }
+        ]
+      }
+    ]
+  },
   "decisions": [
     { "title": "skyrise repo is public", "why": "Concrete, current infra/dotfiles work is the resume signal; secrets never live in git so public is safe." },
     { "title": "Dashboard is Tailscale-only", "why": "Personal build log has no reason to be internet-facing; tailnet already includes box, phone, and the MacBook." },
