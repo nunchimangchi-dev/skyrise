@@ -166,12 +166,15 @@
       {
         "id": "deployment",
         "title": "Persistent deployment",
-        "status": "todo",
-        "summary": "droppdd has no systemd service yet - every verification pass so far has meant manually starting npm run start and temporarily stealing the dashboard's tailscale serve slot. Needs its own systemd --user unit and its own tailscale serve port, same pattern as this dashboard.",
+        "status": "done",
+        "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/4",
+        "summary": "droppdd now runs as a real systemd --user service with its own tailscale serve slot (8443) - no more manually starting npm run start and stealing the dashboard's slot for every test.",
         "steps": [
-          { "label": "systemd --user unit running npm run start (own port, separate from the dashboard's 8787)", "status": "todo" },
-          { "label": "tailscale serve on its own port so it stops colliding with the dashboard", "status": "todo" },
-          { "label": "Production AUTH_URL set in the service's own environment, not the shared dev .env", "status": "todo" }
+          { "label": "systemd --user unit (droppdd.service) running production npm run start on port 3001", "status": "done" },
+          { "label": "tailscale serve on its own port (8443) - coexists with the dashboard's 443/8787", "status": "done" },
+          { "label": "Production AUTH_URL set in the service's own environment, not the shared dev .env", "status": "done" },
+          { "label": "Real end-to-end Google sign-in verified live against the deployed URL", "status": "done" },
+          { "label": "PR #4 merged to main", "status": "done" }
         ]
       },
       {
