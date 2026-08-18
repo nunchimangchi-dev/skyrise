@@ -151,11 +151,27 @@
       {
         "id": "design-pass",
         "title": "Cosmetic design pass",
-        "status": "in-progress",
-        "summary": "Mobile bottom nav got crowded once sign-out landed there as a 5th item; /signin is bare. Cosmetic only, no logic changes.",
+        "status": "done",
+        "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/3",
+        "summary": "Mobile bottom nav got crowded once sign-out landed there as a 5th item; /signin was bare. Cosmetic only, no logic changes.",
         "steps": [
           { "label": "Prompt drafted (docs/GEMINI-DESIGN-PASS-PROMPT.md)", "status": "done" },
-          { "label": "Run via gemini interactively, /model set to avoid quota-capped models", "status": "todo" }
+          { "label": "Run via gemini interactively (gemini-3-flash-preview)", "status": "done" },
+          { "label": "Sign-out relocated to mobile top header; bottom nav back to 4 items", "status": "done" },
+          { "label": "Sign-in page redesigned; page headers on Dashboard/Workouts/Meals given real visual weight", "status": "done" },
+          { "label": "Human review caught + fixed a duplicated \"REPS REPS\" bug on the dashboard WOD card", "status": "done" },
+          { "label": "PR #3 merged to main", "status": "done" }
+        ]
+      },
+      {
+        "id": "deployment",
+        "title": "Persistent deployment",
+        "status": "todo",
+        "summary": "droppdd has no systemd service yet - every verification pass so far has meant manually starting npm run start and temporarily stealing the dashboard's tailscale serve slot. Needs its own systemd --user unit and its own tailscale serve port, same pattern as this dashboard.",
+        "steps": [
+          { "label": "systemd --user unit running npm run start (own port, separate from the dashboard's 8787)", "status": "todo" },
+          { "label": "tailscale serve on its own port so it stops colliding with the dashboard", "status": "todo" },
+          { "label": "Production AUTH_URL set in the service's own environment, not the shared dev .env", "status": "todo" }
         ]
       },
       {
