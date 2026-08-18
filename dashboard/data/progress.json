@@ -180,11 +180,15 @@
       {
         "id": "wagers",
         "title": "Wagers / commitment contracts",
-        "status": "todo",
+        "status": "in-progress",
+        "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/5",
         "summary": "Put your \"money\" where your mouth is - wager against yourself (or eventually another user) on a fitness goal. Honor system first; real money + charity payouts is the end state.",
         "steps": [
           { "label": "Roadmap + legal/safety constraints written up (docs/FUTURE-WAGERS.md)", "status": "done" },
-          { "label": "Phase 1: solo commitment contracts, honor system, no money", "status": "todo" },
+          { "label": "Wager data model - schema + migration only, no UI yet (PR #5 merged)", "status": "done" },
+          { "label": "Creation flow with the goal-aggressiveness guardrail enforced", "status": "todo" },
+          { "label": "Resolution logic tied to existing Progress/WeightRecord data", "status": "todo" },
+          { "label": "Phase 1 complete: solo commitment contracts, honor system, no money", "status": "todo" },
           { "label": "Phase 2: peer wagers, still no money", "status": "todo" },
           { "label": "Phase 3: real money, solo only (legal review required first)", "status": "todo" }
         ]
