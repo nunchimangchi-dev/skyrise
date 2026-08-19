@@ -5,10 +5,10 @@ set -euo pipefail
 
 if command -v pacman >/dev/null 2>&1; then
   echo "==> Arch/CachyOS: installing via pacman (needs sudo)"
-  sudo pacman -S --needed git github-cli tmux fish fisher bitwarden-cli chezmoi fzf zoxide nodejs-lts-jod npm
+  sudo pacman -S --needed git github-cli tmux fish fisher bitwarden-cli chezmoi fzf zoxide nodejs-lts-jod npm starship eza bat
 elif command -v brew >/dev/null 2>&1; then
   echo "==> macOS: installing via Homebrew"
-  brew install git gh tmux fish bitwarden-cli chezmoi fzf zoxide
+  brew install git gh tmux fish bitwarden-cli chezmoi fzf zoxide starship eza bat
   # fisher is installed as a fish plugin below, not a brew formula
 else
   echo "No supported package manager found (expected pacman or brew)." >&2
