@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-19T01:02:08Z",
+  "updated": "2026-08-19T04:18:03Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -10,7 +10,7 @@
   },
   "hosts": [
     { "name": "box", "role": "CachyOS Linux homelab server", "status": "in-progress" },
-    { "name": "MacBook Pro", "role": "Secondary dev machine (macOS)", "status": "todo" }
+    { "name": "MacBook Pro", "role": "Secondary dev machine (macOS)", "status": "done" }
   ],
   "phases": [
     {
@@ -213,6 +213,8 @@
     { "title": "Git commit email is GitHub's noreply address", "why": "Standard privacy practice — keeps the real iCloud address out of public commit metadata." },
     { "title": "droppdd starts as a Next.js web app", "why": "Fastest path to something usable on a phone browser today; mobile app shell can wrap it later if needed." },
     { "title": "MagicDNS short hostname deferred", "why": "Would need a systemd-resolved/NetworkManager fix, and Tailscale's auto-cert only covers the full .ts.net name anyway, so a short name would break HTTPS. Not worth it yet — full URL works fine." },
-    { "title": "Reboot verification confirmed full auto-recovery", "why": "Rebooted box and checked the dashboard service, tailscale serve, and tmux-continuum boot-restore against docs/POST-REBOOT-CHECKLIST.md — all came back with zero manual steps, closing out the tmux phase." }
+    { "title": "Reboot verification confirmed full auto-recovery", "why": "Rebooted box and checked the dashboard service, tailscale serve, and tmux-continuum boot-restore against docs/POST-REBOOT-CHECKLIST.md — all came back with zero manual steps, closing out the tmux phase." },
+    { "title": "fish config switched from CachyOS's bundled theme to Starship", "why": "The old config.fish sourced a CachyOS-only package for its prompt, which doesn't exist on macOS — broke the one-source-of-truth goal before the Mac was even involved. Starship is genuinely cross-platform and turned out to already be the Mac's real prompt (it overrides Oh My Zsh's theme in the old .zshrc), so switching preserved the look the user already liked instead of losing it." },
+    { "title": "MacBook Pro bootstrap completed with fish as the default shell", "why": "Full bootstrap run (packages, git/gh identity, chezmoi dotfiles, tmux+tpm, fisher) plus the account-level shell switch — all confirmed with the user directly at each consequential step (dotfiles diff review, killing a pre-existing unrelated tmux session, the sudo/chsh commands run by the user themselves, never by an agent)." }
   ]
 }
