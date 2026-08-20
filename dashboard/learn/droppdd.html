@@ -65,6 +65,68 @@ git checkout -b feat/thing
 # Open a PR once pushed
 gh pr create</code></pre>
   </div>
+
+  <div class="learn-section">
+    <h2>Testing it yourself, step by step</h2>
+    <p>
+      This is the sequence used to verify every feature before it's called
+      done — worth running through yourself so you can speak to it in an
+      interview without needing to take it on faith.
+    </p>
+    <ol>
+      <li>
+        <strong>Build it first.</strong> <code>npm run build</code> — this
+        catches type errors and broken routes before you even open a
+        browser. A clean build is the first bar, not the last one.
+      </li>
+      <li>
+        <strong>Run it locally.</strong> <code>npm run dev</code> starts on
+        <code>localhost:3000</code> (the live deployment runs separately on
+        3001 via systemd, so dev and prod never collide).
+      </li>
+      <li>
+        <strong>Sign in for real.</strong> Google OAuth, gated by the
+        <code>AllowedEmail</code> table — there's no test/mock login. If
+        your Google account isn't already on the allowlist, add it via
+        <code>npx prisma studio</code> first.
+      </li>
+      <li>
+        <strong>Click through every page</strong>, not just the one you
+        changed: Dashboard, Workouts, Meals, Progress, Wagers. A change to
+        shared code (auth, the Navbar, the Prisma schema) can quietly break
+        a page you didn't touch.
+      </li>
+      <li>
+        <strong>Verify against the database directly</strong>, not just what
+        the UI shows — the UI can look right while nothing actually
+        persisted. <code>sqlite3 prisma/dev.db "select * from Wager;"</code>
+        (swap the table name for whatever you're checking) confirms the
+        write actually happened.
+      </li>
+      <li>
+        <strong>Test the failure path, not just the happy path.</strong> For
+        Wagers specifically: try creating one with an unsafe weight-loss
+        target (more than ~1% bodyweight/week) — it should be rejected with
+        a plain-language error, not silently accepted or a crash. That
+        guardrail is the actual point of the feature.
+      </li>
+    </ol>
+  </div>
+
+  <div class="learn-section">
+    <h2>Talking points if asked "walk me through this"</h2>
+    <p>
+      The Wagers feature (shipped 2026-08-19) is a good one to know cold:
+      <code>Progress</code>/<code>WeightRecord</code> were originally global,
+      unscoped tables — a real data-model bug hiding in plain sight because
+      the app only ever had one user. Fixing it meant a hand-edited SQLite
+      migration to backfill existing rows to the real user before making the
+      column required, plus a new session-based auth gate on the Progress
+      page that didn't exist before. That's a concrete example of a change
+      that looked small on the surface (add a feature) but required
+      understanding and fixing something underneath it first.
+    </p>
+  </div>
 </div>
 </body>
 </html>

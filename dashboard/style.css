@@ -414,3 +414,14 @@ a { color: var(--series-blue); }
   font-size: 0.85rem;
   margin: 8px 0 0;
 }
+
+.learn-section ol {
+  margin: 0;
+  padding-left: 1.3em;
+  color: var(--text-primary);
+  font-size: 0.94rem;
+}
+
+.learn-section ol li + li {
+  margin-top: 10px;
+}
