@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-20T13:14:42Z",
+  "updated": "2026-08-20T17:52:00Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -11,23 +11,26 @@
   "hosts": [
     { "name": "box", "role": "CachyOS Linux homelab server", "status": "in-progress" },
     { "name": "MacBook Pro", "role": "Secondary dev machine (macOS)", "status": "done" },
-    { "name": "pveopti (Proxmox)", "role": "Hypervisor behind OPNsense - target for self-hosted web infrastructure", "status": "in-progress" }
+    { "name": "pveopti (Proxmox)", "role": "Hypervisor behind OPNsense - target for self-hosted web infrastructure", "status": "done" },
+    { "name": "web01", "role": "LXC on Proxmox (VLAN20, isolated) - nginx + cloudflared, serves alwaysgivealwaysget.com via Cloudflare Tunnel", "status": "done" }
   ],
   "phases": [
     {
       "id": "homelab-hosting",
       "title": "Homelab web hosting (Proxmox + OPNsense + Cloudflare Tunnel)",
-      "status": "in-progress",
+      "status": "done",
       "summary": "Turning a Proxmox host behind OPNsense into a self-hosted replacement for a VPS/cloud web server - Tailscale-connected, an isolated LXC webserver, all public exposure through Cloudflare Tunnel with zero port-forwarding. Same \"real, demonstrable infrastructure\" thread as the rest of this project, not a toy.",
       "steps": [
         { "label": "Discovered OPNsense (\"fw1\") was already tailnet-connected, advertising all 3 LAN subnet routes - box just never accepted them", "status": "done" },
         { "label": "Enabled route acceptance on box - full reachability to the Proxmox network via OPNsense's existing routing", "status": "done" },
         { "label": "Proxmox (\"pveopti\") joined the tailnet with its own dedicated identity, not just reachable via the routed subnet", "status": "done" },
         { "label": "SSH key-based auth to Proxmox established - root password never touched this session at any point", "status": "done" },
-        { "label": "Confirm OPNsense's actual VLAN layout, place new webserver on an isolated VLAN (not the management network)", "status": "todo" },
-        { "label": "LXC container: nginx + its own Tailscale identity + cloudflared", "status": "todo" },
-        { "label": "New Cloudflare Tunnel - alwaysgivealwaysget.com (dormant domain, reactivated for real use) served through it", "status": "todo" },
-        { "label": "Internal DNS + real ACME/DNS-01 certs for an internal-only subdomain, resurrecting last night's dormant acme-dns01 token intent", "status": "todo" }
+        { "label": "Diagnosed and fixed a physical switch trunking gap blocking VLAN20/30 (ruled out Proxmox/OPNsense config via container, VM, and cross-VLAN tests first)", "status": "done" },
+        { "label": "Confirmed OPNsense's actual VLAN layout, placed new webserver on isolated VLAN20 - firewall rule verified to block mgmt/other VLANs while allowing internet egress", "status": "done" },
+        { "label": "LXC container (web01): nginx + its own Tailscale identity + cloudflared - all live and verified", "status": "done" },
+        { "label": "New Cloudflare Tunnel - alwaysgivealwaysget.com (dormant domain, reactivated for real use) served through it end-to-end over HTTPS", "status": "done" },
+        { "label": "Internal DNS live on int.nunchimangchi.com (AdGuard Home rewrites) - resolves internally only, confirmed empty from public resolvers", "status": "done" },
+        { "label": "Found the dormant ACME DNS-01 setup already existed (wildcard cert for *.int.nunchimangchi.com, live Cloudflare token) - verified it still works with a real re-sign, then deployed the cert to Proxmox's web UI (no more self-signed warning)", "status": "done" }
       ]
     },
     {
@@ -235,6 +238,11 @@
     { "title": "MacBook Pro bootstrap completed with fish as the default shell", "why": "Full bootstrap run (packages, git/gh identity, chezmoi dotfiles, tmux+tpm, fisher) plus the account-level shell switch — all confirmed with the user directly at each consequential step (dotfiles diff review, killing a pre-existing unrelated tmux session, the sudo/chsh commands run by the user themselves, never by an agent)." },
     { "title": "Homelab web server exposed only via Cloudflare Tunnel, never port-forwarded", "why": "No inbound firewall holes on the OPNsense edge for a personal project — the tunnel connector makes an outbound-only connection, so there's nothing for a scanner to find regardless of what's running behind it." },
     { "title": "New webserver LXC gets its own isolated VLAN, not the Proxmox/OPNsense management network", "why": "A publicly-reachable service (even behind a tunnel) shouldn't have L2 access to anything sensitive if it's ever compromised — real segmentation, not just faith in the tunnel." },
-    { "title": "SSH key-based auth set up for Proxmox before doing anything else", "why": "The root password was retrieved from Bitwarden and used directly in the user's own terminal — never pasted into chat, never touched by the agent. Matches the same credential-handling discipline as every other host in this project." }
+    { "title": "SSH key-based auth set up for Proxmox before doing anything else", "why": "The root password was retrieved from Bitwarden and used directly in the user's own terminal — never pasted into chat, never touched by the agent. Matches the same credential-handling discipline as every other host in this project." },
+    { "title": "Added a narrow firewall exception (port 53 only) from VLAN20 to the AdGuard Home resolver on the mgmt network, instead of rebinding AdGuard to every VLAN", "why": "AdGuard Home was only ever bound to the mgmt interface (192.168.10.1) — VLAN20/30 clients had no working DNS at all. A scoped DNS-only carve-out in the existing isolation rule keeps the rest of the isolation intact rather than widening AdGuard's listen scope." },
+    { "title": "Reset alwaysgivealwaysget.com's zone security_level from under_attack back to medium", "why": "Leftover from the domain's earlier compromised state — it was silently JS-challenging every request, including the tunnel's own traffic, before the new legitimate site could ever be reached." },
+    { "title": "Internal DNS uses int.nunchimangchi.com (real subdomain), not a .lan TLD", "why": "A .lan/.local TLD can never get a publicly-trusted CA cert. A real subdomain that's only ever registered in internal DNS (never published in public DNS) gets valid, no-warning HTTPS internally the technically correct way — and it already matched OPNsense's own existing hostname convention (fw1.int.nunchimangchi.com)." },
+    { "title": "Verified the existing ACME DNS-01 token instead of rotating it on sight", "why": "Found a live Cloudflare-scoped token already wired into OPNsense's ACME client, last used successfully 3 weeks prior — rather than assume it was the deleted/compromised one from the earlier account cleanup, did a real functional test (triggered an actual cert re-sign) to confirm it's a distinct, still-valid token before relying on it." },
+    { "title": "Closed the loop on cert renewal instead of a one-time manual push", "why": "The wildcard cert was renewing correctly but nothing restarted the services using it — OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign — OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps." }
   ]
 }

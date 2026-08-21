@@ -46,6 +46,15 @@ dashboard/           static site + data/progress.json (the status dashboard)
 docs/DECISIONS.md   why things were chosen, not just what
 ```
 
+## Starting a new project
+
+Copy [`docs/NEW-PROJECT-SECURITY-BASELINE.md`](docs/NEW-PROJECT-SECURITY-BASELINE.md)
+into the new repo as `docs/SECURITY-BASELINE.md` at scaffold time, not after
+the fact — see droppdd's copy for a filled-in real example. This exists
+because droppdd's first security review found that everything which turned
+out fine did so by tooling-default accident, not a deliberate standard
+applied at project start.
+
 ## Principles
 
 - **No secrets in git.** Ever. Vault access is through Bitwarden CLI at runtime.
