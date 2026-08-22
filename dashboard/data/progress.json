@@ -254,7 +254,7 @@
           { "label": "Creation flow with the goal-aggressiveness guardrail enforced (PR #6 merged)", "status": "done" },
           { "label": "Resolution logic tied to existing Progress/WeightRecord data (PR #6 merged)", "status": "done" },
           { "label": "Phase 1 complete: solo commitment contracts, honor system, no money", "status": "done" },
-          { "label": "Found by an ultrareview pass against merged PR #6: metric enum + targetValue NaN weren't validated, could silently mis-resolve wagers or throw an unhandled DB error - fix open as PR #7, CI green, not yet merged", "status": "in-progress" },
+          { "label": "Found by an ultrareview pass against merged PR #6: metric enum + targetValue NaN weren't validated - PR #7 opened to fix it directly, then found already fixed by the later Zod schema in the security-baseline commit (createWagerSchema enforces the enum and .finite()); PR #7 closed as superseded rather than merged into a conflict", "status": "done" },
           { "label": "Phase 2: peer wagers, still no money", "status": "todo" },
           { "label": "Phase 3: real money, solo only (legal review required first)", "status": "todo" }
         ]
