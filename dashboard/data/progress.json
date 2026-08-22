@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-20T17:52:00Z",
+  "updated": "2026-08-22T01:37:24Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -136,6 +136,50 @@
       ]
     }
   ],
+  "unbrokerrdd": {
+    "repo": "https://github.com/nunchimangchi-dev/unbrokerrdd",
+    "phases": [
+      {
+        "id": "bootstrap-hygiene",
+        "title": "Bootstrap + security hygiene",
+        "status": "done",
+        "summary": "Started as DATABROKER.deep, renamed unbrokerrdd - a Go CLI/dashboard automating data-broker opt-out requests. Real module path, CI, and a cost-reduction pre-check ahead of the paid vision-verification step.",
+        "steps": [
+          { "label": "Go module path fixed to github.com/nunchimangchi-dev/unbrokerrdd (go install works for third parties)", "status": "done" },
+          { "label": "Go toolchain bumped 1.26 -> 1.26.7, fixed 18 real stdlib CVEs (govulncheck: 18 -> 0)", "status": "done" },
+          { "label": "govulncheck added to CI", "status": "done" },
+          { "label": "domText fast-path pre-check added before Claude vision API calls - real test coverage, asymmetric by design (only short-circuits on failure signals, never success, since false-success is worse than false-failure for a privacy tool)", "status": "done" },
+          { "label": "SECURITY-BASELINE.md written, corrected on the spot after a wrong initial claim (rate limiting was already real, via time.After)", "status": "done" }
+        ]
+      },
+      {
+        "id": "tos-research",
+        "title": "ToS legality research",
+        "status": "done",
+        "pr": "https://github.com/nunchimangchi-dev/unbrokerrdd/pull/1",
+        "summary": "CCPA authorized-agent grounding (Cal. Civ. Code 1798.135, 11 CCR 7063) and the Delete Act/DROP platform - Gemini-drafted, independently verified against primary sources (privacy.ca.gov/drop, peopleconnect.us terms), one citation corrected, two unverified stats flagged rather than presented as fact.",
+        "steps": [
+          { "label": "Research pass with explicit primary-source citation requirements", "status": "done" },
+          { "label": "Verified citations directly via WebFetch against primary sources; corrected one, flagged two unverified stats", "status": "done" },
+          { "label": "PR #1 merged", "status": "done" }
+        ]
+      },
+      {
+        "id": "visual-design",
+        "title": "Visual design overhaul",
+        "status": "in-progress",
+        "summary": "Three design passes took the dashboard from a generic blue/indigo/purple AI-SaaS look, through a hacker-terminal-HUD detour, to a calm sage/forest-green palette grounded in two real dashboard references - each pass verified by actually rendering it, not by trusting the handoff notes.",
+        "steps": [
+          { "label": "Pass 1: removed the Three.js/CDN particle background and dead code", "status": "done" },
+          { "label": "Pass 2: removed hacker-terminal styling (ALL_CAPS jargon, scrolling console log, radar sweep) and .exe branding, replaced with sentence-case trust-oriented language", "status": "done" },
+          { "label": "Pass 3: replaced the blue-indigo-purple palette with a sage/forest-green/cream system", "status": "done" },
+          { "label": "Caught and fixed an incomplete refactor: ~13 hardcoded rgba() values from the old palette survived in badges/status colors despite the token definitions being updated", "status": "done" },
+          { "label": "Replaced the radar/scatter-dot panel (still read as sci-fi surveillance chrome even after recoloring) with a circular \"Protection Status\" progress ring", "status": "done" },
+          { "label": "Open a PR from design/dashboard-refresh into main", "status": "todo" }
+        ]
+      }
+    ]
+  },
   "droppdd": {
     "repo": "https://github.com/nunchimangchi-dev/droppdd",
     "phases": [
@@ -209,9 +253,44 @@
           { "label": "Scoped Progress/WeightRecord to userId - were global singletons, inconsistent with Wager (PR #6 merged)", "status": "done" },
           { "label": "Creation flow with the goal-aggressiveness guardrail enforced (PR #6 merged)", "status": "done" },
           { "label": "Resolution logic tied to existing Progress/WeightRecord data (PR #6 merged)", "status": "done" },
-          { "label": "Phase 1 complete: solo commitment contracts, honor system, no money", "status": "todo" },
+          { "label": "Phase 1 complete: solo commitment contracts, honor system, no money", "status": "done" },
+          { "label": "Found by an ultrareview pass against merged PR #6: metric enum + targetValue NaN weren't validated, could silently mis-resolve wagers or throw an unhandled DB error - fix open as PR #7, CI green, not yet merged", "status": "in-progress" },
           { "label": "Phase 2: peer wagers, still no money", "status": "todo" },
           { "label": "Phase 3: real money, solo only (legal review required first)", "status": "todo" }
+        ]
+      },
+      {
+        "id": "design-pass-2",
+        "title": "Bold high-contrast visual design pass",
+        "status": "done",
+        "summary": "Second cosmetic pass, refactored the wagers page along the way. Direct commits to main, no PR.",
+        "steps": [
+          { "label": "Prompt drafted for Gemini design pass 2", "status": "done" },
+          { "label": "Bold high-contrast visual system implemented, wagers page refactored", "status": "done" },
+          { "label": "Merged to main", "status": "done" }
+        ]
+      },
+      {
+        "id": "security-baseline",
+        "title": "Security baseline",
+        "status": "done",
+        "summary": "Same balanced-security-practices pass applied across every project this cycle: Zod input validation, an npm audit CI gate, and a legal-draft prompt for future ToS/legal review.",
+        "steps": [
+          { "label": "Zod validation added", "status": "done" },
+          { "label": "npm audit CI gate added", "status": "done" },
+          { "label": "Legal-draft prompt written", "status": "done" }
+        ]
+      },
+      {
+        "id": "staging-environment",
+        "title": "Real staging environment",
+        "status": "done",
+        "summary": "Separate LXC (droppdd-staging, VMID 102, VLAN20, its own Tailscale identity) with its own disposable SQLite DB and systemd service - no more testing against production or borrowing the production port.",
+        "steps": [
+          { "label": "droppdd-staging LXC provisioned on the isolated VLAN20", "status": "done" },
+          { "label": "Own SQLite DB, seeded independently - disposable, never copied from prod", "status": "done" },
+          { "label": "Own systemd --user service, own tailscale serve slot (8443), same Google OAuth client with a second redirect URI", "status": "done" },
+          { "label": "docs/STAGING.md documents the manual deploy-to-staging steps", "status": "done" }
         ]
       },
       {
@@ -243,6 +322,7 @@
     { "title": "Reset alwaysgivealwaysget.com's zone security_level from under_attack back to medium", "why": "Leftover from the domain's earlier compromised state — it was silently JS-challenging every request, including the tunnel's own traffic, before the new legitimate site could ever be reached." },
     { "title": "Internal DNS uses int.nunchimangchi.com (real subdomain), not a .lan TLD", "why": "A .lan/.local TLD can never get a publicly-trusted CA cert. A real subdomain that's only ever registered in internal DNS (never published in public DNS) gets valid, no-warning HTTPS internally the technically correct way — and it already matched OPNsense's own existing hostname convention (fw1.int.nunchimangchi.com)." },
     { "title": "Verified the existing ACME DNS-01 token instead of rotating it on sight", "why": "Found a live Cloudflare-scoped token already wired into OPNsense's ACME client, last used successfully 3 weeks prior — rather than assume it was the deleted/compromised one from the earlier account cleanup, did a real functional test (triggered an actual cert re-sign) to confirm it's a distinct, still-valid token before relying on it." },
-    { "title": "Closed the loop on cert renewal instead of a one-time manual push", "why": "The wildcard cert was renewing correctly but nothing restarted the services using it — OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign — OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps." }
+    { "title": "Closed the loop on cert renewal instead of a one-time manual push", "why": "The wildcard cert was renewing correctly but nothing restarted the services using it — OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign — OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps." },
+    { "title": "unbrokerrdd's dashboard reached via Tailscale Funnel, not new public hosting", "why": "Needed a genuinely public link (viewable without tailnet membership) for an in-person demo on a short timeline. Funnel gives that directly off the existing Tailscale setup with no new infra. A custom-domain CNAME to it was considered and ruled out: Funnel's TLS cert only covers the assigned *.ts.net name, so a custom domain would show a certificate mismatch. Real public hosting on its own domain would reuse the homelab/Cloudflare Tunnel pattern already proven for alwaysgivealwaysget.com, but that's a separate, larger build-out — not worth rushing for a one-off demo." }
   ]
 }

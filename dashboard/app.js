@@ -65,7 +65,7 @@ function phaseCardHTML(p, i) {
 }
 
 function render(data) {
-  const { meta, hosts, phases, decisions, updated, droppdd } = data;
+  const { meta, hosts, phases, decisions, updated, droppdd, unbrokerrdd } = data;
   const { done, total } = countSteps(phases);
   const pct = total ? Math.round((done / total) * 100) : 0;
   const phasesDone = phases.filter((p) => p.status === "done").length;
@@ -112,6 +112,15 @@ function render(data) {
     const droppddRepoLink = document.querySelector("#droppdd-repo-link");
     droppddRepoLink.href = droppdd.repo;
     droppddRepoLink.textContent = droppdd.repo.replace("https://", "");
+  }
+
+  if (unbrokerrdd) {
+    document.querySelector(".unbrokerrdd-phase-list").innerHTML = unbrokerrdd.phases
+      .map((p, i) => phaseCardHTML(p, `unbrokerrdd-${i}`))
+      .join("");
+    const unbrokerrddRepoLink = document.querySelector("#unbrokerrdd-repo-link");
+    unbrokerrddRepoLink.href = unbrokerrdd.repo;
+    unbrokerrddRepoLink.textContent = unbrokerrdd.repo.replace("https://", "");
   }
 
   document.querySelectorAll(".phase-card").forEach((card) => {
