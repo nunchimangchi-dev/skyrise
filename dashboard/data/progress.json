@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-22T01:37:24Z",
+  "updated": "2026-08-22T03:03:59Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -12,7 +12,9 @@
     { "name": "box", "role": "CachyOS Linux homelab server", "status": "in-progress" },
     { "name": "MacBook Pro", "role": "Secondary dev machine (macOS)", "status": "done" },
     { "name": "pveopti (Proxmox)", "role": "Hypervisor behind OPNsense - target for self-hosted web infrastructure", "status": "done" },
-    { "name": "web01", "role": "LXC on Proxmox (VLAN20, isolated) - nginx + cloudflared, serves alwaysgivealwaysget.com via Cloudflare Tunnel", "status": "done" }
+    { "name": "web01", "role": "LXC on Proxmox (VLAN20, isolated) - nginx + cloudflared, serves alwaysgivealwaysget.com via Cloudflare Tunnel", "status": "done" },
+    { "name": "droppdd-prod", "role": "LXC on Proxmox (VLAN20, isolated) - droppdd production, migrated off box, public at droppdd.alwaysgivealwaysget.com", "status": "done" },
+    { "name": "unbrokerrdd", "role": "LXC on Proxmox (VLAN20, isolated) - unbrokerrdd dashboard, public at unbrokerrdd.alwaysgivealwaysget.com", "status": "done" }
   ],
   "phases": [
     {
@@ -30,7 +32,9 @@
         { "label": "LXC container (web01): nginx + its own Tailscale identity + cloudflared - all live and verified", "status": "done" },
         { "label": "New Cloudflare Tunnel - alwaysgivealwaysget.com (dormant domain, reactivated for real use) served through it end-to-end over HTTPS", "status": "done" },
         { "label": "Internal DNS live on int.nunchimangchi.com (AdGuard Home rewrites) - resolves internally only, confirmed empty from public resolvers", "status": "done" },
-        { "label": "Found the dormant ACME DNS-01 setup already existed (wildcard cert for *.int.nunchimangchi.com, live Cloudflare token) - verified it still works with a real re-sign, then deployed the cert to Proxmox's web UI (no more self-signed warning)", "status": "done" }
+        { "label": "Found the dormant ACME DNS-01 setup already existed (wildcard cert for *.int.nunchimangchi.com, live Cloudflare token) - verified it still works with a real re-sign, then deployed the cert to Proxmox's web UI (no more self-signed warning)", "status": "done" },
+        { "label": "Two more isolated VLAN20 LXCs (droppdd-prod, unbrokerrdd), same pattern as web01 - droppdd's real production DB/secrets migrated off box, unbrokerrdd deployed fresh, both added to web01's existing tunnel as new ingress hostnames + DNS records", "status": "done" },
+        { "label": "Cloudflare Access enabled in front of both new public apps (account was already Zero Trust-enrolled, zero setup cost) - verified end-to-end via browser, real email-OTP login gate confirmed on both", "status": "done" }
       ]
     },
     {
@@ -167,7 +171,7 @@
       {
         "id": "visual-design",
         "title": "Visual design overhaul",
-        "status": "in-progress",
+        "status": "done",
         "summary": "Three design passes took the dashboard from a generic blue/indigo/purple AI-SaaS look, through a hacker-terminal-HUD detour, to a calm sage/forest-green palette grounded in two real dashboard references - each pass verified by actually rendering it, not by trusting the handoff notes.",
         "steps": [
           { "label": "Pass 1: removed the Three.js/CDN particle background and dead code", "status": "done" },
@@ -175,7 +179,18 @@
           { "label": "Pass 3: replaced the blue-indigo-purple palette with a sage/forest-green/cream system", "status": "done" },
           { "label": "Caught and fixed an incomplete refactor: ~13 hardcoded rgba() values from the old palette survived in badges/status colors despite the token definitions being updated", "status": "done" },
           { "label": "Replaced the radar/scatter-dot panel (still read as sci-fi surveillance chrome even after recoloring) with a circular \"Protection Status\" progress ring", "status": "done" },
-          { "label": "Open a PR from design/dashboard-refresh into main", "status": "todo" }
+          { "label": "PR #2 merged to main", "status": "done" }
+        ]
+      },
+      {
+        "id": "public-deployment",
+        "title": "Public deployment",
+        "status": "done",
+        "summary": "Considered Tailscale Funnel first for a fast public link, rejected for not being memorable. Deployed instead to its own isolated LXC, public at unbrokerrdd.alwaysgivealwaysget.com, gated by Cloudflare Access (the dashboard itself has no login of its own).",
+        "steps": [
+          { "label": "Dashboard's hardcoded loopback-only bind made configurable (DATABROKERGO_BIND) so it can listen on a real interface behind the tunnel - loopback stays the default for local/personal use", "status": "done" },
+          { "label": "Deployed to its own isolated VLAN20 LXC, added to web01's Cloudflare Tunnel as a new ingress hostname + DNS record", "status": "done" },
+          { "label": "Cloudflare Access gate verified live end-to-end (real email-OTP login page on the actual public domain)", "status": "done" }
         ]
       }
     ]
@@ -294,6 +309,19 @@
         ]
       },
       {
+        "id": "public-deployment",
+        "title": "Production migrated to its own isolated LXC, public domain",
+        "status": "done",
+        "summary": "Production had been running directly on box (systemd --user, tailscale serve only - not memorable, not reachable by web01's tunnel without breaking VLAN isolation). Migrated the real database and secrets to a new isolated LXC (droppdd-prod), now public at droppdd.alwaysgivealwaysget.com, gated by Cloudflare Access in front of its existing Google OAuth + allowlist.",
+        "steps": [
+          { "label": "New isolated VLAN20 LXC (droppdd-prod) provisioned, same pattern as web01/droppdd-staging", "status": "done" },
+          { "label": "Real production DB + secrets copied over (not a fresh reseed); `prisma migrate deploy` confirmed zero pending migrations post-copy", "status": "done" },
+          { "label": "AUTH_URL updated for the new domain; added to web01's Cloudflare Tunnel as a new ingress hostname + DNS record", "status": "done" },
+          { "label": "Cloudflare Access gate verified live end-to-end (real email-OTP login page on the actual public domain, ahead of droppdd's own sign-in)", "status": "done" },
+          { "label": "Update the Google OAuth client's authorized redirect URIs for the new domain (human-only step, Bitwarden-held credentials)", "status": "todo" }
+        ]
+      },
+      {
         "id": "ai-meal-planning",
         "title": "AI-assisted meal planning",
         "status": "todo",
@@ -323,6 +351,9 @@
     { "title": "Internal DNS uses int.nunchimangchi.com (real subdomain), not a .lan TLD", "why": "A .lan/.local TLD can never get a publicly-trusted CA cert. A real subdomain that's only ever registered in internal DNS (never published in public DNS) gets valid, no-warning HTTPS internally the technically correct way — and it already matched OPNsense's own existing hostname convention (fw1.int.nunchimangchi.com)." },
     { "title": "Verified the existing ACME DNS-01 token instead of rotating it on sight", "why": "Found a live Cloudflare-scoped token already wired into OPNsense's ACME client, last used successfully 3 weeks prior — rather than assume it was the deleted/compromised one from the earlier account cleanup, did a real functional test (triggered an actual cert re-sign) to confirm it's a distinct, still-valid token before relying on it." },
     { "title": "Closed the loop on cert renewal instead of a one-time manual push", "why": "The wildcard cert was renewing correctly but nothing restarted the services using it — OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign — OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps." },
-    { "title": "unbrokerrdd's dashboard reached via Tailscale Funnel, not new public hosting", "why": "Needed a genuinely public link (viewable without tailnet membership) for an in-person demo on a short timeline. Funnel gives that directly off the existing Tailscale setup with no new infra. A custom-domain CNAME to it was considered and ruled out: Funnel's TLS cert only covers the assigned *.ts.net name, so a custom domain would show a certificate mismatch. Real public hosting on its own domain would reuse the homelab/Cloudflare Tunnel pattern already proven for alwaysgivealwaysget.com, but that's a separate, larger build-out — not worth rushing for a one-off demo." }
+    { "title": "droppdd and unbrokerrdd moved to real public hosting on memorable subdomains, not Tailscale", "why": "A Tailscale Funnel *.ts.net URL was considered first (fastest path to a public link) but rejected: it isn't memorable, and someone shown droppdd in person has no way to recall or revisit a ts.net address later. Real subdomains of the already-owned alwaysgivealwaysget.com (droppdd.*, unbrokerrdd.*) reuse the proven Cloudflare Tunnel infrastructure from web01, each app on its own isolated VLAN20 LXC per the same isolation principle — not a shortcut, the same pattern extended." },
+    { "title": "droppdd's production instance migrated off box onto its own isolated LXC (droppdd-prod)", "why": "Production had been running as a systemd --user service directly on box, reachable only via tailscale serve — box can't be reached by web01's tunnel without punching a hole through the VLAN20-to-management isolation that's the whole point of this design. Migrated the real database and secrets (not a fresh reseed) onto a new LXC on VLAN20, verified `prisma migrate deploy` reported zero pending migrations post-copy before cutting over." },
+    { "title": "Cloudflare Access gates both public apps, not just app-level login", "why": "unbrokerrdd's dashboard has no authentication of its own at all, and droppdd's own Google OAuth + allowlist only gates the app — neither should be reachable by an unauthenticated request purely on the strength of app code. Access (already enrolled on the account, zero setup cost, one-time-PIN email login) sits in front of the Cloudflare Tunnel and denies unauthenticated requests before they reach either origin. Currently allowlisted: owner only." },
+    { "title": "Per-app admin panel is a tracked requirement, not solved by Cloudflare's dashboard", "why": "Cloudflare Access's own dashboard is the only way to add/remove allowed users right now (see docs/RUNBOOK-ADD-USER-CLOUDFLARE-ACCESS.md) — functional, but explicitly called out as not good enough long-term: it's invisible from either app and doesn't demonstrate real full-stack (L1-L7) ownership of the access-control layer. Backlog: a real admin view in each app, with Access staying on as the outer gate regardless (defense in depth, not a replacement)." }
   ]
 }
