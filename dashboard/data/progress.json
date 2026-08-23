@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23T16:01:08Z",
+  "updated": "2026-08-23T16:14:45Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -37,7 +37,8 @@
         { "label": "Cloudflare Access enabled in front of both new public apps (account was already Zero Trust-enrolled, zero setup cost) - verified end-to-end via browser, real email-OTP login gate confirmed on both", "status": "done" },
         { "label": "Home Assistant (192.168.20.183) given a real trusted cert via a second OPNsense ACME validation entry scoped to alwaysgivealwaysget.com (a fresh Cloudflare token - the original nunchimangchi.com token is zone-locked, always needed its own). Two automation actions (SFTP cert upload, SSH-triggered HA restart) needed separate SSH key algorithms - OPNsense reuses one keypair per algorithm across actions, so both on ed25519 caused the restart command to get shadowed by the SFTP action's forced-command authorized_keys line. Live cert independently verified via direct TLS connection, not just trusted from the report.", "status": "done" },
         { "label": "Added an internal-only AdGuard rewrite for ha.alwaysgivealwaysget.com -> 192.168.20.183, plus Tailscale Split DNS (nameserver 192.168.10.1, restricted to the alwaysgivealwaysget.com domain) so it resolves correctly on cellular too - both verified with live DNS queries, not just config review", "status": "done" },
-        { "label": "Caught and fixed a real regression from the AdGuard step above: the rewrite was first added as a wildcard (*.alwaysgivealwaysget.com), which combined with the new Tailscale Split DNS to hijack droppdd/unbrokerrdd's subdomains to Home Assistant's IP for anyone on the home network or tailnet (public internet visitors were unaffected - they never touch AdGuard). Narrowed to an explicit ha.alwaysgivealwaysget.com entry only, matching the existing per-host convention already used for int.nunchimangchi.com. Found by explicitly re-checking droppdd/unbrokerrdd after the DNS change, not assumed safe.", "status": "done" }
+        { "label": "Caught and fixed a real regression from the AdGuard step above: the rewrite was first added as a wildcard (*.alwaysgivealwaysget.com), which combined with the new Tailscale Split DNS to hijack droppdd/unbrokerrdd's subdomains to Home Assistant's IP for anyone on the home network or tailnet (public internet visitors were unaffected - they never touch AdGuard). Narrowed to an explicit ha.alwaysgivealwaysget.com entry only, matching the existing per-host convention already used for int.nunchimangchi.com. Found by explicitly re-checking droppdd/unbrokerrdd after the DNS change, not assumed safe.", "status": "done" },
+        { "label": "HA's internal_url/external_url were stale (plain HTTP, wrong subnet IP from an earlier dual-homing setup) - updated both to https://ha.alwaysgivealwaysget.com:8123 (same value for both, since split-horizon DNS + Tailscale Split DNS collapses the home/away distinction to one hostname). Verified end-to-end via the real hostname: correct Let's Encrypt cert, HTTP 200 - the actual path the iOS Companion App takes, not just the raw IP.", "status": "done" }
       ]
     },
     {
