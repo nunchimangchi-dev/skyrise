@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-22T03:03:59Z",
+  "updated": "2026-08-23T13:43:49Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -186,11 +186,26 @@
         "id": "public-deployment",
         "title": "Public deployment",
         "status": "done",
-        "summary": "Considered Tailscale Funnel first for a fast public link, rejected for not being memorable. Deployed instead to its own isolated LXC, public at unbrokerrdd.alwaysgivealwaysget.com, gated by Cloudflare Access (the dashboard itself has no login of its own).",
+        "summary": "Considered Tailscale Funnel first for a fast public link, rejected for not being memorable. Deployed instead to its own isolated LXC, public at unbrokerrdd.alwaysgivealwaysget.com, gated by Cloudflare Access at the edge.",
         "steps": [
           { "label": "Dashboard's hardcoded loopback-only bind made configurable (DATABROKERGO_BIND) so it can listen on a real interface behind the tunnel - loopback stays the default for local/personal use", "status": "done" },
           { "label": "Deployed to its own isolated VLAN20 LXC, added to web01's Cloudflare Tunnel as a new ingress hostname + DNS record", "status": "done" },
           { "label": "Cloudflare Access gate verified live end-to-end (real email-OTP login page on the actual public domain)", "status": "done" }
+        ]
+      },
+      {
+        "id": "admin-panel",
+        "title": "Admin panel: identity, roles, PII profile, run control",
+        "status": "done",
+        "pr": "https://github.com/nunchimangchi-dev/unbrokerrdd/pull/3",
+        "summary": "The dashboard had zero identity/auth of its own before this - now trusts Cloudflare Access's authenticated-user header (no redundant login system, fits the single-tenant architecture) with a real viewer/admin role split. Backend delivered by Gemini and verified directly (real passing tests, correct last-admin invariant); the actual admin UI shipped with zero frontend, so that was built directly instead of trusting a second blind Gemini pass.",
+        "steps": [
+          { "label": "Identity middleware trusts Cf-Access-Authenticated-User-Email; allowed_users/subject_profile tables; UNBROKERRDD_ADMIN_EMAIL bootstrap avoids a first-boot lockout", "status": "done" },
+          { "label": "Run control (/api/batch, mutex-guarded), per-broker retry (/api/reset), PII profile (/api/profile), access management (/api/users, last-admin invariant enforced) - every handler independently re-checks admin role", "status": "done" },
+          { "label": "Real test suite added (server_test.go) - run and verified directly, not just trusted from HANDOFF.md", "status": "done" },
+          { "label": "Admin UI (static/admin.html, role-gated nav link + per-broker retry button in index.html) built directly after finding Gemini shipped backend only - visually verified live via browser before committing", "status": "done" },
+          { "label": "Deployed live: bootstrap confirmed (nunchimangchi@icloud.com seeded as first admin), Cloudflare Access gate verified on the real public admin.html", "status": "done" },
+          { "label": "Found, not yet fixed: index.html hardcodes ws://localhost:8080/ws for its live WebSocket - fails on the real domain, silently falls back to client-side demo simulation instead of showing real broker data", "status": "todo" }
         ]
       }
     ]
@@ -354,6 +369,8 @@
     { "title": "droppdd and unbrokerrdd moved to real public hosting on memorable subdomains, not Tailscale", "why": "A Tailscale Funnel *.ts.net URL was considered first (fastest path to a public link) but rejected: it isn't memorable, and someone shown droppdd in person has no way to recall or revisit a ts.net address later. Real subdomains of the already-owned alwaysgivealwaysget.com (droppdd.*, unbrokerrdd.*) reuse the proven Cloudflare Tunnel infrastructure from web01, each app on its own isolated VLAN20 LXC per the same isolation principle — not a shortcut, the same pattern extended." },
     { "title": "droppdd's production instance migrated off box onto its own isolated LXC (droppdd-prod)", "why": "Production had been running as a systemd --user service directly on box, reachable only via tailscale serve — box can't be reached by web01's tunnel without punching a hole through the VLAN20-to-management isolation that's the whole point of this design. Migrated the real database and secrets (not a fresh reseed) onto a new LXC on VLAN20, verified `prisma migrate deploy` reported zero pending migrations post-copy before cutting over." },
     { "title": "Cloudflare Access gates both public apps, not just app-level login", "why": "unbrokerrdd's dashboard has no authentication of its own at all, and droppdd's own Google OAuth + allowlist only gates the app — neither should be reachable by an unauthenticated request purely on the strength of app code. Access (already enrolled on the account, zero setup cost, one-time-PIN email login) sits in front of the Cloudflare Tunnel and denies unauthenticated requests before they reach either origin. Currently allowlisted: owner only." },
-    { "title": "Per-app admin panel is a tracked requirement, not solved by Cloudflare's dashboard", "why": "Cloudflare Access's own dashboard is the only way to add/remove allowed users right now (see docs/RUNBOOK-ADD-USER-CLOUDFLARE-ACCESS.md) — functional, but explicitly called out as not good enough long-term: it's invisible from either app and doesn't demonstrate real full-stack (L1-L7) ownership of the access-control layer. Backlog: a real admin view in each app, with Access staying on as the outer gate regardless (defense in depth, not a replacement)." }
+    { "title": "Per-app admin panel is a tracked requirement, not solved by Cloudflare's dashboard", "why": "Cloudflare Access's own dashboard is the only way to add/remove allowed users right now (see docs/RUNBOOK-ADD-USER-CLOUDFLARE-ACCESS.md) — functional, but explicitly called out as not good enough long-term: it's invisible from either app and doesn't demonstrate real full-stack (L1-L7) ownership of the access-control layer. Backlog: a real admin view in each app, with Access staying on as the outer gate regardless (defense in depth, not a replacement)." },
+    { "title": "unbrokerrdd trusts Cloudflare Access's identity header instead of building its own login", "why": "Unlike droppdd (real multi-user data models, peer wagers coming), unbrokerrdd is single-tenant — one campaign, no per-user data to scope. A second login system (OAuth, password) would duplicate what Access already does at the edge. The app reads Cf-Access-Authenticated-User-Email directly and maps it to a viewer/admin role in its own allowed_users table — safe only because the app has no public port-forward and is unreachable except through the tunnel Access sits in front of." },
+    { "title": "Gemini's unbrokerrdd admin-panel backend was verified directly, then its missing frontend was built by hand rather than re-prompted blind", "why": "The backend pass was genuinely solid — real passing tests, correct last-admin invariant, correct concurrency guard — but shipped zero UI despite the prompt asking for admin views/forms, and HANDOFF.md never flagged the gap. Once a backend contract is stable and well-tested, wiring a UI to it is comparatively low-risk, fast-to-verify work — built directly and visually confirmed live rather than spending another blind Gemini round on it." }
   ]
 }
