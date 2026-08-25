@@ -65,7 +65,7 @@ function phaseCardHTML(p, i) {
 }
 
 function render(data) {
-  const { meta, hosts, phases, decisions, updated, droppdd, unbrokerrdd } = data;
+  const { meta, hosts, phases, decisions, updated, droppdd, unbrokerrdd, "career-ops": careerOps } = data;
   const { done, total } = countSteps(phases);
   const pct = total ? Math.round((done / total) * 100) : 0;
   const phasesDone = phases.filter((p) => p.status === "done").length;
@@ -121,6 +121,15 @@ function render(data) {
     const unbrokerrddRepoLink = document.querySelector("#unbrokerrdd-repo-link");
     unbrokerrddRepoLink.href = unbrokerrdd.repo;
     unbrokerrddRepoLink.textContent = unbrokerrdd.repo.replace("https://", "");
+  }
+
+  if (careerOps) {
+    document.querySelector(".career-ops-phase-list").innerHTML = careerOps.phases
+      .map((p, i) => phaseCardHTML(p, `career-ops-${i}`))
+      .join("");
+    const careerOpsRepoLink = document.querySelector("#career-ops-repo-link");
+    careerOpsRepoLink.href = careerOps.repo;
+    careerOpsRepoLink.textContent = careerOps.repo.replace("https://", "");
   }
 
   document.querySelectorAll(".phase-card").forEach((card) => {

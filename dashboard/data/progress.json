@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-23T16:14:45Z",
+  "updated": "2026-08-25T23:52:54Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -341,13 +341,77 @@
         ]
       },
       {
+        "id": "multiuser-beta",
+        "title": "Real multi-user beta (10 slots) - infra phase",
+        "status": "done",
+        "summary": "First step of a 3-phase expansion (multi-user infra -> AI meal planning -> leaderboard, deliberately sequenced since a leaderboard is meaningless without real users on it). Found and fixed a real data-isolation bug along the way: the home dashboard queried Progress with no userId filter at all, meaning every signed-in user saw whichever row happened to be first in the table - invisible with one real user, would have leaked data across people the moment a second beta user signed in.",
+        "steps": [
+          { "label": "Fixed the unscoped prisma.progress.findFirst() bug in page.tsx - now session-derived userId, matching the already-correct pattern in progress/page.tsx and wagers/page.tsx", "status": "done" },
+          { "label": "Built real self-service onboarding (/onboarding + a Zod-validated server action) - previously a new user hit a dead-end \"no progress data\" wall with no way through it", "status": "done" },
+          { "label": "Fixed Navbar's hardcoded \"12 DAYS STRONG\" streak - now threaded per-user through layout.tsx, same pattern already used for isAdmin", "status": "done" },
+          { "label": "Beta-slot counter added to the admin panel (X / 10, soft warning only - a product framing device, not a hard technical cap)", "status": "done" },
+          { "label": "Driven via Gemini in real interactive mode over tmux (not blind headless -p, not unattended --yolo) - Claude watched and approved each tool action live, then independently re-verified the security-critical diffs (session scoping, Zod validation, double-onboarding guard) after the fact", "status": "done" },
+          { "label": "npm run build and npm run lint both passed live during the run; deployed to droppdd-prod and verified (307 auth redirect confirmed on the real host)", "status": "done" }
+        ]
+      },
+      {
         "id": "ai-meal-planning",
         "title": "AI-assisted meal planning",
         "status": "todo",
-        "summary": "The \"AI meal planning - coming soon\" card on the Meals page is still just a placeholder.",
+        "summary": "Phase 2 of the beta expansion (after multi-user infra, before the leaderboard). The pitch: \"sign up now, use this food list and exercise regimen, expect these results\" - much easier to make that claim once macros and exercise are locked in. Two entry points that are really one capability: pantry-driven (\"kitchen sink\" - enter what's on hand, get recipe guidance) and macro-driven (\"let's go shopping\" - AI-suggested grocery list to hit keto macro targets, recipes derived from it).",
         "steps": [
           { "label": "Pick an API (Gemini API, per the original plan - saves Claude usage for coding work)", "status": "todo" },
           { "label": "Implement generation + wire up the placeholder card", "status": "todo" }
+        ]
+      },
+      {
+        "id": "leaderboard",
+        "title": "Beta leaderboard",
+        "status": "todo",
+        "summary": "Phase 3, deliberately last (needs real beta users on real multi-user infra to mean anything). Privacy decision already made: relative metrics only (% toward goal, streak) - not raw weight or other absolute numbers, for a small trusted beta group of 10.",
+        "steps": [
+          { "label": "Build the leaderboard view once real beta users exist", "status": "todo" }
+        ]
+      }
+    ]
+  },
+  "career-ops": {
+    "repo": "https://github.com/nunchimangchi-dev/career-ops",
+    "summary": "A real, actively-used job-search tracker (private data - real applications, scores, notes), not a demo despite the original directory name. Worked jointly with a second Claude session (\"Current salary floor\") running on the user's Mac, where this project actually lives - box has no filesystem access to it except via a bridged SSH connection set up specifically for this.",
+    "phases": [
+      {
+        "id": "private-repo-fix",
+        "title": "Fixed a real data-exposure risk",
+        "status": "done",
+        "summary": "This was a clone of a public third-party template (santifer/career-ops) still pointing at that repo as origin, with real personal data untracked in the working tree - one git push away from landing in someone else's public GitHub.",
+        "steps": [
+          { "label": "Created a new private repo (nunchimangchi-dev/career-ops) the user actually owns", "status": "done" },
+          { "label": "Repointed origin to the private repo, kept the original template as a fetch-only upstream remote (push disabled) rather than discarding template-update capability entirely", "status": "done" },
+          { "label": "Real personal data committed and pushed to the private repo, verified independently via the GitHub API (not just trusting the report)", "status": "done" }
+        ]
+      },
+      {
+        "id": "tracker-cleanup",
+        "title": "Tracker data cleanup",
+        "status": "done",
+        "summary": "144 files removed under an explicit criterion (never clicked through to an actual application, regardless of date) - not a date cutoff, which would have discarded real signal like an old application that got a response.",
+        "steps": [
+          { "label": "Real inventory built before any deletion - exact counts, status-column semantics, named edge cases (a live warm lead, 3 untracked orphan reports) surfaced for explicit decisions rather than folded into the bulk criterion", "status": "done" },
+          { "label": "Both edge cases decided explicitly by the user (kept the live lead, removed the orphans)", "status": "done" },
+          { "label": "Peer session declined to execute off a relayed \"user decided X\" and got the user's own direct confirmation first - correct call, same standard held throughout this project for consequential/hard-to-reverse actions", "status": "done" },
+          { "label": "Learned the hard way that \"this repo has git history\" isn't the same claim as \"these specific files are tracked\" - reports/ and output/ turned out to be gitignored, so this cleanup had no git safety net despite an earlier (wrong) reassurance that it did", "status": "done" }
+        ]
+      },
+      {
+        "id": "design-pass",
+        "title": "Design pass on pipeline-dashboard.html",
+        "status": "done",
+        "summary": "Moved off the same generic dark-obsidian/cyan-neon aether-core.css palette unbrokerrdd's first pass also had to move away from, onto a bespoke \"Slate & Steel-Blue\" identity grounded in a real cited reference (Linear's dark theme). Also removed the Chart.js CDN dependency (a live third-party network signal every time a private tool got opened) by vendoring it locally.",
+        "steps": [
+          { "label": "Drafted from the real file content (relayed with personal data sanitized to placeholders - the other session's own good judgment, not requested)", "status": "done" },
+          { "label": "Run via Gemini in genuine interactive mode over a tmux session bridged from box - not blind headless -p (tool-restricted) and not unattended --yolo (a real trust decision the auto-mode classifier correctly flagged); Claude watched and approved each tool action live instead", "status": "done" },
+          { "label": "Verified directly after the fact: real scoped commit, complete 205KB Chart.js bundle, JS logic/data/personal-identifier locations all confirmed untouched via diff", "status": "done" },
+          { "label": "Merged to main; push blocked by an expired gh token on that Mac (human re-auth needed, not something to force through non-interactively)", "status": "done" }
         ]
       }
     ]
