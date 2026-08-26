@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-26T00:29:04Z",
+  "updated": "2026-08-26T15:18:23Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -731,7 +731,7 @@
             "status": "done"
           },
           {
-            "label": "Beta-slot counter added to the admin panel (X / 10, soft warning only - a product framing device, not a hard technical cap)",
+            "label": "Beta-slot counter added to the admin panel (X / 10) - later hardened from a soft warning into a real enforced cap, see admin-panel-audit",
             "status": "done"
           },
           {
@@ -1072,6 +1072,10 @@
           },
           {
             "label": "Built the data-rights flow: /admin/users/[id]/export (Route Handler, deliberately outside /api since proxy.ts's middleware excludes that prefix from auth), consequence preview (flags active peer challenges specifically), required export-acknowledgement checkbox + typed exact-username confirmation (re-verified server-side, not trusted from the client). Cascade-delete mechanics verified empirically against dev data before building on top of them, not assumed. console.log audit trail, not a new DB table, given current scale",
+            "status": "done"
+          },
+          {
+            "label": "Beta-cap enforcement: the X/10 slot counter was cosmetic only - addAllowedEmail had no cap check, so the form kept accepting new operators past 10 with just an orange banner. Now rejects non-admin invites once BETA_USER_LIMIT (moved to its own src/lib/beta-limit.ts - a \"use server\" file can only export async actions, a plain constant there broke the build) is reached; admins are excluded from the cap. Deliberately a code-level limit requiring a redeploy to raise, not a UI toggle",
             "status": "done"
           }
         ]
