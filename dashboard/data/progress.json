@@ -888,7 +888,7 @@
         "id": "onboarding-ux-audit",
         "title": "Onboarding UX audit (cold-visitor persona walkthrough)",
         "status": "in-progress",
-        "summary": "Walked the actual live app end-to-end as a specific persona - \"I got this link/invite from a Reddit post, clicked it, and...\" - rather than reviewing in the abstract. Every finding below was confirmed by reading the real code/config, not assumed. Two related findings (the unstyled AccessDenied error page, and the missing privacy/ToS consent step + new onboarding fields for age/height/meal preference) are tracked in more detail as session memory rather than duplicated here. The audit itself is done; the fixes below are backlog, not yet built. First round of fixes shipped 2026-08-26: a real consent gate (/welcome, Privacy Policy + Beta Terms), new profile fields (age/height/meal preference with unit toggles), privacy-reassurance copy, a branded auth-error page, and the dashboard's fake OMAD timer replaced with an honest placeholder. Remaining items (no landing content, Cloudflare Access allowlist, pre-onboarding browsing, WOD/meal rotation) are still open.",
+        "summary": "Walked the actual live app end-to-end as a specific persona - \"I got this link/invite from a Reddit post, clicked it, and...\" - rather than reviewing in the abstract. Every finding below was confirmed by reading the real code/config, not assumed. Two related findings (the unstyled AccessDenied error page, and the missing privacy/ToS consent step + new onboarding fields for age/height/meal preference) are tracked in more detail as session memory rather than duplicated here. The audit itself is done; the fixes below are backlog, not yet built. First round of fixes shipped 2026-08-26: a real consent gate (/welcome, Privacy Policy + Beta Terms), new profile fields (age/height/meal preference with unit toggles), privacy-reassurance copy, a branded auth-error page, and the dashboard's fake OMAD timer replaced with an honest placeholder. Remaining items (no landing content, Cloudflare Access allowlist, pre-onboarding browsing, WOD/meal rotation) are still open. Second round shipped 2026-08-26: /signin now pitches the app (workouts, AI meals, wagers, leaderboard) before asking for OAuth, and the dashboard's WOD/meal picks actually rotate daily now instead of showing the same fixed catalog row forever. 7 of 9 findings resolved - only the two the maintainer explicitly deferred remain (Cloudflare Access allowlist, pre-onboarding read-only browsing).",
         "steps": [
           {
             "label": "Cloudflare Access is allowlisted to one email - by design for now, but means literally no cold visitor can reach the app at all until beta invites open the gate up",
@@ -896,7 +896,7 @@
           },
           {
             "label": "No landing/marketing content anywhere - /signin IS the landing page, asks for a Google OAuth grant before explaining what droppdd even is",
-            "status": "todo"
+            "status": "done"
           },
           {
             "label": "/choose-username never explains the username is publicly visible on the leaderboard and to wager opponents - real risk of picking a throwaway name they'd regret",
@@ -924,7 +924,7 @@
           },
           {
             "label": "\"Today's WOD\" and \"upcoming meal\" are prisma.findFirst() with no filter - the same fixed catalog row for every user, every day, not actually daily or personalized despite the framing",
-            "status": "todo"
+            "status": "done"
           }
         ]
       }
