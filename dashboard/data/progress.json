@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-26T15:18:23Z",
+  "updated": "2026-08-26T15:36:16Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -578,9 +578,9 @@
       {
         "id": "wagers",
         "title": "Wagers / commitment contracts",
-        "status": "in-progress",
+        "status": "done",
         "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/6",
-        "summary": "Put your \"money\" where your mouth is - wager against yourself (or eventually another user) on a fitness goal. Honor system first; real money + charity payouts is the end state.",
+        "summary": "Put your \"money\" where your mouth is - wager against yourself or another user on a fitness goal, honor system. Real money was the originally-planned end state; dropped 2026-08-26 (see steps below) - the free peer-wager model is now the permanent shape of this feature.",
         "steps": [
           {
             "label": "Roadmap + legal/safety constraints written up (docs/FUTURE-WAGERS.md)",
@@ -611,12 +611,12 @@
             "status": "done"
           },
           {
-            "label": "Phase 2: peer wagers, still no money",
-            "status": "todo"
+            "label": "Phase 2: peer wagers, still no money - shipped, see the peer-wagers phase below",
+            "status": "done"
           },
           {
-            "label": "Phase 3: real money, solo only (legal review required first)",
-            "status": "todo"
+            "label": "Phase 3/4 (real money, solo and peer-vs-peer): dropped, not deferred - decided during an App Store feasibility discussion. Real money would drag in Apple's strict, inconsistent gambling-review stance on peer stakes, but the deciding factor was independent of that: the maintainer's own experience is that people motivated enough to game a real-money fitness stake just settle up outside the app anyway (a workaround he ran himself for years against Fitbit's own incentives). docs/FUTURE-WAGERS.md updated to match",
+            "status": "done"
           }
         ]
       },
@@ -1276,6 +1276,10 @@
     {
       "title": "Found and fixed: droppdd's progress-tracking never actually worked past onboarding",
       "why": "Continuing the persona walkthrough, the maintainer asked directly how users update their weight after signup. Checked the code rather than assume: WeightRecord.create was only ever called once, at onboarding. Further check: currentStreak is set to 0 at onboarding and grepping the entire src tree found zero places anything ever increments it - the streak shown everywhere (dashboard, Navbar, leaderboard) was permanently 0 for every user, and WorkoutTracker's set-completion checkboxes are pure client-side state with no persistence at all. This meant WEIGHT_TARGET wagers could only ever resolve LOST (via time expiry), never WON, since the number they're measured against never moved. Built a real daily check-in flow (streak defined as consecutive check-in days, confirmed with the maintainer first since it wasn't specified) that fixes both weight and streak tracking at once. Exercise-completion logging deliberately left as a tracked future feature per the maintainer's explicit call, not bundled into this fix."
+    },
+    {
+      "title": "Real-money wager phases dropped from the roadmap, not deferred",
+      "why": "Came up during an App Store feasibility discussion - real money would drag droppdd into Apple's strict, inconsistent gambling-review stance on peer-vs-peer stakes if it ever went native. But the deciding factor was independent of App Store concerns: the maintainer's own lived experience is that people motivated enough to game a real-money fitness stake will just settle up outside the app anyway - a workaround he ran himself for years against Fitbit's own step-based incentives. The legal/compliance cost of building real custody-adjacent payment flows buys less real enforcement than it looks like on paper. docs/FUTURE-WAGERS.md updated to mark phases 3-4 dropped; the free honor-system peer wager (phases 1-2, both already shipped) is now the permanent shape of this feature. Also surfaced two longer-horizon product wishes in the same conversation: push notifications (streak reminders, wager-opponent check-ins) as the near-term next step, and Apple Health/Fitness integration further out - both future work, not scheduled."
     }
   ]
 }
