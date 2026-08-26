@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-25T23:52:54Z",
+  "updated": "2026-08-26T00:14:31Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -357,11 +357,15 @@
       {
         "id": "ai-meal-planning",
         "title": "AI-assisted meal planning",
-        "status": "todo",
-        "summary": "Phase 2 of the beta expansion (after multi-user infra, before the leaderboard). The pitch: \"sign up now, use this food list and exercise regimen, expect these results\" - much easier to make that claim once macros and exercise are locked in. Two entry points that are really one capability: pantry-driven (\"kitchen sink\" - enter what's on hand, get recipe guidance) and macro-driven (\"let's go shopping\" - AI-suggested grocery list to hit keto macro targets, recipes derived from it).",
+        "status": "done",
+        "summary": "Phase 2 of the beta expansion. The pitch: \"sign up now, use this food list and exercise regimen, expect these results\" - much easier to make that claim once macros and exercise are locked in. One combined generation flow, two entry points: pantry-driven (\"kitchen sink\") and macro-driven (\"let's go shopping\", also returns a grocery list). Deliberately ephemeral - generated meals are never persisted (no Meal row, no DB write at all); saved meals are an explicit future paid-tier feature, not built here.",
         "steps": [
-          { "label": "Pick an API (Gemini API, per the original plan - saves Claude usage for coding work)", "status": "todo" },
-          { "label": "Implement generation + wire up the placeholder card", "status": "todo" }
+          { "label": "@google/generative-ai + gemini-1.5-flash, constrained to JSON output at the API level (responseMimeType) as a first defense layer", "status": "done" },
+          { "label": "Session check, Zod-validated input (discriminated union for the two entry points), AND Zod-validated AI output before ever rendering it - the model's JSON response is treated as untrusted input, same as client form data, not trusted because it came back as JSON", "status": "done" },
+          { "label": "Verified directly: zero prisma import anywhere in the action file - the cleanest possible confirmation the ephemeral-only requirement actually holds, not just claimed", "status": "done" },
+          { "label": "Driven via the same tmux-bridged interactive Gemini technique as the multi-user infra phase; caught and corrected one real issue live - it tried to commit as a generic \"Gemini CLI\" git identity after a local-repo identity resolution failure, denied that and set the correct project identity directly instead", "status": "done" },
+          { "label": "npm run build and npm run lint both passed; deployed to droppdd-prod (new npm dependency required npm ci before build, not just build)", "status": "done" },
+          { "label": "Needs a real GEMINI_API_KEY added to droppdd-prod's .env before generation actually works end-to-end - human-only credential step, not done yet. Missing-key case fails cleanly (a real error message, not a crash) so this is safe to ship ahead of the key.", "status": "todo" }
         ]
       },
       {
