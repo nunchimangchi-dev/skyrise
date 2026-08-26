@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-26T15:36:16Z",
+  "updated": "2026-08-26T16:15:48Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -888,11 +888,11 @@
         "id": "onboarding-ux-audit",
         "title": "Onboarding UX audit (cold-visitor persona walkthrough)",
         "status": "in-progress",
-        "summary": "Walked the actual live app end-to-end as a specific persona - \"I got this link/invite from a Reddit post, clicked it, and...\" - rather than reviewing in the abstract. Every finding below was confirmed by reading the real code/config, not assumed. Two related findings (the unstyled AccessDenied error page, and the missing privacy/ToS consent step + new onboarding fields for age/height/meal preference) are tracked in more detail as session memory rather than duplicated here. The audit itself is done; the fixes below are backlog, not yet built. First round of fixes shipped 2026-08-26: a real consent gate (/welcome, Privacy Policy + Beta Terms), new profile fields (age/height/meal preference with unit toggles), privacy-reassurance copy, a branded auth-error page, and the dashboard's fake OMAD timer replaced with an honest placeholder. Remaining items (no landing content, Cloudflare Access allowlist, pre-onboarding browsing, WOD/meal rotation) are still open. Second round shipped 2026-08-26: /signin now pitches the app (workouts, AI meals, wagers, leaderboard) before asking for OAuth, and the dashboard's WOD/meal picks actually rotate daily now instead of showing the same fixed catalog row forever. 7 of 9 findings resolved - only the two the maintainer explicitly deferred remain (Cloudflare Access allowlist, pre-onboarding read-only browsing).",
+        "summary": "Walked the actual live app end-to-end as a specific persona - \"I got this link/invite from a Reddit post, clicked it, and...\" - rather than reviewing in the abstract. Every finding below was confirmed by reading the real code/config, not assumed. Two related findings (the unstyled AccessDenied error page, and the missing privacy/ToS consent step + new onboarding fields for age/height/meal preference) are tracked in more detail as session memory rather than duplicated here. The audit itself is done; the fixes below are backlog, not yet built. First round of fixes shipped 2026-08-26: a real consent gate (/welcome, Privacy Policy + Beta Terms), new profile fields (age/height/meal preference with unit toggles), privacy-reassurance copy, a branded auth-error page, and the dashboard's fake OMAD timer replaced with an honest placeholder. Second round shipped 2026-08-26: /signin now pitches the app (workouts, AI meals, wagers, leaderboard) before asking for OAuth, and the dashboard's WOD/meal picks actually rotate daily now instead of showing the same fixed catalog row forever. Third round shipped 2026-08-26: Cloudflare Access opened for droppdd specifically (bypass decision, not just a widened allowlist - verified this removes the extra Access login prompt entirely rather than just accepting any identity through it), so real beta invites (friends, eventually Reddit) can reach droppdd's own sign-in directly. 8 of 9 findings resolved - only pre-onboarding read-only browsing remains, still explicitly deferred by the maintainer.",
         "steps": [
           {
-            "label": "Cloudflare Access is allowlisted to one email - by design for now, but means literally no cold visitor can reach the app at all until beta invites open the gate up",
-            "status": "todo"
+            "label": "Cloudflare Access opened for droppdd: policy decision changed from allow-one-email to bypass (Access stops intercepting the request at all), scoped to droppdd only - unbrokerrdd keeps its Access gate since unbrokerrdd has no auth of its own and its admin/viewer roles literally depend on Access's authenticated-user header for identity. droppdd's own real gate (Google OAuth + AllowedEmail) is unaffected and independently verified still enforcing (307 on /admin). First attempt (widening the policy's include to \"everyone\" while keeping decision \"allow\") was tried and checked live first - still showed an extra Cloudflare login prompt (any email could complete it, but it was still there) - corrected to \"bypass\" once that gap was surfaced",
+            "status": "done"
           },
           {
             "label": "No landing/marketing content anywhere - /signin IS the landing page, asks for a Google OAuth grant before explaining what droppdd even is",
@@ -1235,7 +1235,7 @@
     },
     {
       "title": "Cloudflare Access gates both public apps, not just app-level login",
-      "why": "unbrokerrdd's dashboard has no authentication of its own at all, and droppdd's own Google OAuth + allowlist only gates the app — neither should be reachable by an unauthenticated request purely on the strength of app code. Access (already enrolled on the account, zero setup cost, one-time-PIN email login) sits in front of the Cloudflare Tunnel and denies unauthenticated requests before they reach either origin. Currently allowlisted: owner only."
+      "why": "unbrokerrdd's dashboard has no authentication of its own at all, so Access stays fully enforced there (allowlisted: owner only) and denies unauthenticated requests before they reach the origin. droppdd's own Google OAuth + allowlist gate turned out to be the real access-control layer once it existed - keeping Access double-gated on top of it started blocking real beta invites for no added security, so on 2026-08-26 droppdd's Access policy was changed to bypass (Access stops intercepting the request at all), scoped to droppdd only. See the onboarding-ux-audit phase for the full verification (droppdd's own auth confirmed still enforcing, unbrokerrdd confirmed untouched)."
     },
     {
       "title": "Per-app admin panel is a tracked requirement, not solved by Cloudflare's dashboard",
