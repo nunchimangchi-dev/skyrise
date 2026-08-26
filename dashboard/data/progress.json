@@ -1059,8 +1059,8 @@
       {
         "id": "admin-panel-audit",
         "title": "Admin panel audit (persona/purpose-driven, not just mechanical)",
-        "status": "in-progress",
-        "summary": "Audited /admin against what it's actually for, not just walked for bugs: access control (allowlist), catalog curation (workouts/meals CRUD), and a deliberately read-only per-user troubleshooting view - that read-only design is good and was kept, not loosened. One confirmed regression fixed. One larger finding - the Privacy Policy shipped earlier tonight promises account deletion/data export with zero admin tooling to actually do it - is a design question being scoped separately before building.",
+        "status": "done",
+        "summary": "Audited /admin against what it's actually for, not just walked for bugs: access control (allowlist), catalog curation (workouts/meals CRUD), and a deliberately read-only per-user troubleshooting view - that read-only design is good and was kept, not loosened. One confirmed regression fixed. One larger finding - the Privacy Policy shipped earlier tonight promises account deletion/data export with zero admin tooling to actually do it - is now built: a separate /admin/users/[id]/data-rights flow (export first, consequence preview, two-step server-verified confirmation), deliberately kept off the existing read-only troubleshooting page rather than loosening it.",
         "steps": [
           {
             "label": "/admin/users/[id] showed every weigh-in as year 2001 - confirmed directly (new Date(\"Aug 25\").toLocaleDateString() -> 8/25/2001 in Node), a regression from rendering the old cosmetic date string instead of the real recordedAt timestamp added during check-in. Query ordering was also alphabetical on the string, not chronological. Both fixed",
@@ -1069,6 +1069,10 @@
           {
             "label": "No tooling exists anywhere in the admin panel to fulfill the Privacy Policy's own promised account-deletion/data-export workflow - today that means hand-writing raw Prisma/SQL against prod with no confirmation step or audit trail. Design for a safety-railed flow, not yet built",
             "status": "todo"
+          },
+          {
+            "label": "Built the data-rights flow: /admin/users/[id]/export (Route Handler, deliberately outside /api since proxy.ts's middleware excludes that prefix from auth), consequence preview (flags active peer challenges specifically), required export-acknowledgement checkbox + typed exact-username confirmation (re-verified server-side, not trusted from the client). Cascade-delete mechanics verified empirically against dev data before building on top of them, not assumed. console.log audit trail, not a new DB table, given current scale",
+            "status": "done"
           }
         ]
       }
