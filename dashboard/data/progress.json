@@ -1039,6 +1039,22 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "profile-leaderboard-ux-audit",
+        "title": "Profile + leaderboard UX audit",
+        "status": "done",
+        "summary": "Continued the persona walkthrough into /profile and /leaderboard. Two real findings, both fixed, no schema changes needed - the fields already existed from the earlier onboarding pass.",
+        "steps": [
+          {
+            "label": "age/height/mealPreference were captured once at onboarding with zero edit path afterward - real gap now that mealPreference actively steers AI meal generation. New /profile form to update all three",
+            "status": "done"
+          },
+          {
+            "label": "A 'maintain weight' goal (targetWeight === startWeight, never prevented by onboarding's schema) divided by zero, rendering \"NaN% TOWARD GOAL\" on /progress and /leaderboard - fixed with a guard, and extracted the formula into a single shared src/lib/progress-percent.ts, closing a real drift risk (leaderboard's own comment claimed to reuse the formula but was actually a hand-copied duplicate)",
+            "status": "done"
+          }
+        ]
       }
     ]
   },
