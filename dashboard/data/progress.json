@@ -9,12 +9,36 @@
     "second_host": "MacBook Pro (soobongs-macbook-air on tailnet)"
   },
   "hosts": [
-    { "name": "box", "role": "CachyOS Linux homelab server", "status": "in-progress" },
-    { "name": "MacBook Pro", "role": "Secondary dev machine (macOS)", "status": "done" },
-    { "name": "pveopti (Proxmox)", "role": "Hypervisor behind OPNsense - target for self-hosted web infrastructure", "status": "done" },
-    { "name": "web01", "role": "LXC on Proxmox (VLAN20, isolated) - nginx + cloudflared, serves alwaysgivealwaysget.com via Cloudflare Tunnel", "status": "done" },
-    { "name": "droppdd-prod", "role": "LXC on Proxmox (VLAN20, isolated) - droppdd production, migrated off box, public at droppdd.alwaysgivealwaysget.com", "status": "done" },
-    { "name": "unbrokerrdd", "role": "LXC on Proxmox (VLAN20, isolated) - unbrokerrdd dashboard, public at unbrokerrdd.alwaysgivealwaysget.com", "status": "done" }
+    {
+      "name": "box",
+      "role": "CachyOS Linux homelab server",
+      "status": "in-progress"
+    },
+    {
+      "name": "MacBook Pro",
+      "role": "Secondary dev machine (macOS)",
+      "status": "done"
+    },
+    {
+      "name": "pveopti (Proxmox)",
+      "role": "Hypervisor behind OPNsense - target for self-hosted web infrastructure",
+      "status": "done"
+    },
+    {
+      "name": "web01",
+      "role": "LXC on Proxmox (VLAN20, isolated) - nginx + cloudflared, serves alwaysgivealwaysget.com via Cloudflare Tunnel",
+      "status": "done"
+    },
+    {
+      "name": "droppdd-prod",
+      "role": "LXC on Proxmox (VLAN20, isolated) - droppdd production, migrated off box, public at droppdd.alwaysgivealwaysget.com",
+      "status": "done"
+    },
+    {
+      "name": "unbrokerrdd",
+      "role": "LXC on Proxmox (VLAN20, isolated) - unbrokerrdd dashboard, public at unbrokerrdd.alwaysgivealwaysget.com",
+      "status": "done"
+    }
   ],
   "phases": [
     {
@@ -23,22 +47,70 @@
       "status": "done",
       "summary": "Turning a Proxmox host behind OPNsense into a self-hosted replacement for a VPS/cloud web server - Tailscale-connected, an isolated LXC webserver, all public exposure through Cloudflare Tunnel with zero port-forwarding. Same \"real, demonstrable infrastructure\" thread as the rest of this project, not a toy.",
       "steps": [
-        { "label": "Discovered OPNsense (\"fw1\") was already tailnet-connected, advertising all 3 LAN subnet routes - box just never accepted them", "status": "done" },
-        { "label": "Enabled route acceptance on box - full reachability to the Proxmox network via OPNsense's existing routing", "status": "done" },
-        { "label": "Proxmox (\"pveopti\") joined the tailnet with its own dedicated identity, not just reachable via the routed subnet", "status": "done" },
-        { "label": "SSH key-based auth to Proxmox established - root password never touched this session at any point", "status": "done" },
-        { "label": "Diagnosed and fixed a physical switch trunking gap blocking VLAN20/30 (ruled out Proxmox/OPNsense config via container, VM, and cross-VLAN tests first)", "status": "done" },
-        { "label": "Confirmed OPNsense's actual VLAN layout, placed new webserver on isolated VLAN20 - firewall rule verified to block mgmt/other VLANs while allowing internet egress", "status": "done" },
-        { "label": "LXC container (web01): nginx + its own Tailscale identity + cloudflared - all live and verified", "status": "done" },
-        { "label": "New Cloudflare Tunnel - alwaysgivealwaysget.com (dormant domain, reactivated for real use) served through it end-to-end over HTTPS", "status": "done" },
-        { "label": "Internal DNS live on int.nunchimangchi.com (AdGuard Home rewrites) - resolves internally only, confirmed empty from public resolvers", "status": "done" },
-        { "label": "Found the dormant ACME DNS-01 setup already existed (wildcard cert for *.int.nunchimangchi.com, live Cloudflare token) - verified it still works with a real re-sign, then deployed the cert to Proxmox's web UI (no more self-signed warning)", "status": "done" },
-        { "label": "Two more isolated VLAN20 LXCs (droppdd-prod, unbrokerrdd), same pattern as web01 - droppdd's real production DB/secrets migrated off box, unbrokerrdd deployed fresh, both added to web01's existing tunnel as new ingress hostnames + DNS records", "status": "done" },
-        { "label": "Cloudflare Access enabled in front of both new public apps (account was already Zero Trust-enrolled, zero setup cost) - verified end-to-end via browser, real email-OTP login gate confirmed on both", "status": "done" },
-        { "label": "Home Assistant (192.168.20.183) given a real trusted cert via a second OPNsense ACME validation entry scoped to alwaysgivealwaysget.com (a fresh Cloudflare token - the original nunchimangchi.com token is zone-locked, always needed its own). Two automation actions (SFTP cert upload, SSH-triggered HA restart) needed separate SSH key algorithms - OPNsense reuses one keypair per algorithm across actions, so both on ed25519 caused the restart command to get shadowed by the SFTP action's forced-command authorized_keys line. Live cert independently verified via direct TLS connection, not just trusted from the report.", "status": "done" },
-        { "label": "Added an internal-only AdGuard rewrite for ha.alwaysgivealwaysget.com -> 192.168.20.183, plus Tailscale Split DNS (nameserver 192.168.10.1, restricted to the alwaysgivealwaysget.com domain) so it resolves correctly on cellular too - both verified with live DNS queries, not just config review", "status": "done" },
-        { "label": "Caught and fixed a real regression from the AdGuard step above: the rewrite was first added as a wildcard (*.alwaysgivealwaysget.com), which combined with the new Tailscale Split DNS to hijack droppdd/unbrokerrdd's subdomains to Home Assistant's IP for anyone on the home network or tailnet (public internet visitors were unaffected - they never touch AdGuard). Narrowed to an explicit ha.alwaysgivealwaysget.com entry only, matching the existing per-host convention already used for int.nunchimangchi.com. Found by explicitly re-checking droppdd/unbrokerrdd after the DNS change, not assumed safe.", "status": "done" },
-        { "label": "HA's internal_url/external_url were stale (plain HTTP, wrong subnet IP from an earlier dual-homing setup) - updated both to https://ha.alwaysgivealwaysget.com:8123 (same value for both, since split-horizon DNS + Tailscale Split DNS collapses the home/away distinction to one hostname). Verified end-to-end via the real hostname: correct Let's Encrypt cert, HTTP 200 - the actual path the iOS Companion App takes, not just the raw IP.", "status": "done" }
+        {
+          "label": "Discovered OPNsense (\"fw1\") was already tailnet-connected, advertising all 3 LAN subnet routes - box just never accepted them",
+          "status": "done"
+        },
+        {
+          "label": "Enabled route acceptance on box - full reachability to the Proxmox network via OPNsense's existing routing",
+          "status": "done"
+        },
+        {
+          "label": "Proxmox (\"pveopti\") joined the tailnet with its own dedicated identity, not just reachable via the routed subnet",
+          "status": "done"
+        },
+        {
+          "label": "SSH key-based auth to Proxmox established - root password never touched this session at any point",
+          "status": "done"
+        },
+        {
+          "label": "Diagnosed and fixed a physical switch trunking gap blocking VLAN20/30 (ruled out Proxmox/OPNsense config via container, VM, and cross-VLAN tests first)",
+          "status": "done"
+        },
+        {
+          "label": "Confirmed OPNsense's actual VLAN layout, placed new webserver on isolated VLAN20 - firewall rule verified to block mgmt/other VLANs while allowing internet egress",
+          "status": "done"
+        },
+        {
+          "label": "LXC container (web01): nginx + its own Tailscale identity + cloudflared - all live and verified",
+          "status": "done"
+        },
+        {
+          "label": "New Cloudflare Tunnel - alwaysgivealwaysget.com (dormant domain, reactivated for real use) served through it end-to-end over HTTPS",
+          "status": "done"
+        },
+        {
+          "label": "Internal DNS live on int.nunchimangchi.com (AdGuard Home rewrites) - resolves internally only, confirmed empty from public resolvers",
+          "status": "done"
+        },
+        {
+          "label": "Found the dormant ACME DNS-01 setup already existed (wildcard cert for *.int.nunchimangchi.com, live Cloudflare token) - verified it still works with a real re-sign, then deployed the cert to Proxmox's web UI (no more self-signed warning)",
+          "status": "done"
+        },
+        {
+          "label": "Two more isolated VLAN20 LXCs (droppdd-prod, unbrokerrdd), same pattern as web01 - droppdd's real production DB/secrets migrated off box, unbrokerrdd deployed fresh, both added to web01's existing tunnel as new ingress hostnames + DNS records",
+          "status": "done"
+        },
+        {
+          "label": "Cloudflare Access enabled in front of both new public apps (account was already Zero Trust-enrolled, zero setup cost) - verified end-to-end via browser, real email-OTP login gate confirmed on both",
+          "status": "done"
+        },
+        {
+          "label": "Home Assistant (192.168.20.183) given a real trusted cert via a second OPNsense ACME validation entry scoped to alwaysgivealwaysget.com (a fresh Cloudflare token - the original nunchimangchi.com token is zone-locked, always needed its own). Two automation actions (SFTP cert upload, SSH-triggered HA restart) needed separate SSH key algorithms - OPNsense reuses one keypair per algorithm across actions, so both on ed25519 caused the restart command to get shadowed by the SFTP action's forced-command authorized_keys line. Live cert independently verified via direct TLS connection, not just trusted from the report.",
+          "status": "done"
+        },
+        {
+          "label": "Added an internal-only AdGuard rewrite for ha.alwaysgivealwaysget.com -> 192.168.20.183, plus Tailscale Split DNS (nameserver 192.168.10.1, restricted to the alwaysgivealwaysget.com domain) so it resolves correctly on cellular too - both verified with live DNS queries, not just config review",
+          "status": "done"
+        },
+        {
+          "label": "Caught and fixed a real regression from the AdGuard step above: the rewrite was first added as a wildcard (*.alwaysgivealwaysget.com), which combined with the new Tailscale Split DNS to hijack droppdd/unbrokerrdd's subdomains to Home Assistant's IP for anyone on the home network or tailnet (public internet visitors were unaffected - they never touch AdGuard). Narrowed to an explicit ha.alwaysgivealwaysget.com entry only, matching the existing per-host convention already used for int.nunchimangchi.com. Found by explicitly re-checking droppdd/unbrokerrdd after the DNS change, not assumed safe.",
+          "status": "done"
+        },
+        {
+          "label": "HA's internal_url/external_url were stale (plain HTTP, wrong subnet IP from an earlier dual-homing setup) - updated both to https://ha.alwaysgivealwaysget.com:8123 (same value for both, since split-horizon DNS + Tailscale Split DNS collapses the home/away distinction to one hostname). Verified end-to-end via the real hostname: correct Let's Encrypt cert, HTTP 200 - the actual path the iOS Companion App takes, not just the raw IP.",
+          "status": "done"
+        }
       ]
     },
     {
@@ -47,11 +119,26 @@
       "status": "done",
       "summary": "Scoped the project, chose tools, inventoried the host, stood up this dashboard.",
       "steps": [
-        { "label": "Inventory host (OS, existing tools, network)", "status": "done" },
-        { "label": "Decide repo visibility, dashboard access, dotfiles tool, droppdd platform", "status": "done" },
-        { "label": "Confirm GitHub account (nunchimangchi-dev) via browser", "status": "done" },
-        { "label": "Scaffold skyrise repo structure", "status": "done" },
-        { "label": "Build this dashboard", "status": "done" }
+        {
+          "label": "Inventory host (OS, existing tools, network)",
+          "status": "done"
+        },
+        {
+          "label": "Decide repo visibility, dashboard access, dotfiles tool, droppdd platform",
+          "status": "done"
+        },
+        {
+          "label": "Confirm GitHub account (nunchimangchi-dev) via browser",
+          "status": "done"
+        },
+        {
+          "label": "Scaffold skyrise repo structure",
+          "status": "done"
+        },
+        {
+          "label": "Build this dashboard",
+          "status": "done"
+        }
       ]
     },
     {
@@ -61,12 +148,30 @@
       "summary": "Local git identity, SSH key, and GitHub CLI auth so every host can push/pull without passwords.",
       "learn": "learn/git-github.html",
       "steps": [
-        { "label": "Set global git identity (noreply email for privacy)", "status": "done" },
-        { "label": "Generate per-host ed25519 SSH key", "status": "done" },
-        { "label": "Install GitHub CLI (gh)", "status": "done" },
-        { "label": "gh auth login (browser OAuth, user-driven)", "status": "done" },
-        { "label": "Register SSH key with GitHub via gh", "status": "done" },
-        { "label": "Create + push skyrise repo (public)", "status": "done" }
+        {
+          "label": "Set global git identity (noreply email for privacy)",
+          "status": "done"
+        },
+        {
+          "label": "Generate per-host ed25519 SSH key",
+          "status": "done"
+        },
+        {
+          "label": "Install GitHub CLI (gh)",
+          "status": "done"
+        },
+        {
+          "label": "gh auth login (browser OAuth, user-driven)",
+          "status": "done"
+        },
+        {
+          "label": "Register SSH key with GitHub via gh",
+          "status": "done"
+        },
+        {
+          "label": "Create + push skyrise repo (public)",
+          "status": "done"
+        }
       ]
     },
     {
@@ -76,9 +181,18 @@
       "summary": "Sane, boring, widely-recognized tmux config: sensible defaults, mouse on, readable status line, session persistence.",
       "learn": "learn/tmux.html",
       "steps": [
-        { "label": "Write ~/.config/tmux/tmux.conf (managed by chezmoi)", "status": "done" },
-        { "label": "Install tpm + tmux-sensible, tmux-resurrect, tmux-continuum", "status": "done" },
-        { "label": "Verify session survives detach/reattach and reboot (continuum)", "status": "done" }
+        {
+          "label": "Write ~/.config/tmux/tmux.conf (managed by chezmoi)",
+          "status": "done"
+        },
+        {
+          "label": "Install tpm + tmux-sensible, tmux-resurrect, tmux-continuum",
+          "status": "done"
+        },
+        {
+          "label": "Verify session survives detach/reattach and reboot (continuum)",
+          "status": "done"
+        }
       ]
     },
     {
@@ -88,10 +202,22 @@
       "summary": "Fish as the default interactive shell, kept close to CachyOS defaults plus a small, standard plugin set via fisher.",
       "learn": "learn/fish.html",
       "steps": [
-        { "label": "chsh -s /usr/bin/fish", "status": "done" },
-        { "label": "Install fisher", "status": "done" },
-        { "label": "Add fzf.fish + zoxide integration", "status": "done" },
-        { "label": "Move config.fish under chezmoi management", "status": "done" }
+        {
+          "label": "chsh -s /usr/bin/fish",
+          "status": "done"
+        },
+        {
+          "label": "Install fisher",
+          "status": "done"
+        },
+        {
+          "label": "Add fzf.fish + zoxide integration",
+          "status": "done"
+        },
+        {
+          "label": "Move config.fish under chezmoi management",
+          "status": "done"
+        }
       ]
     },
     {
@@ -101,9 +227,18 @@
       "summary": "Vault access from the terminal for secrets (never stored in git).",
       "learn": "learn/bitwarden.html",
       "steps": [
-        { "label": "Install bitwarden-cli (bw)", "status": "done" },
-        { "label": "bw login (user-driven, master password)", "status": "done" },
-        { "label": "Document unlock/session pattern for scripts", "status": "done" }
+        {
+          "label": "Install bitwarden-cli (bw)",
+          "status": "done"
+        },
+        {
+          "label": "bw login (user-driven, master password)",
+          "status": "done"
+        },
+        {
+          "label": "Document unlock/session pattern for scripts",
+          "status": "done"
+        }
       ]
     },
     {
@@ -113,34 +248,64 @@
       "summary": "One source of truth for fish/tmux config, applied identically on box and the MacBook.",
       "learn": "learn/chezmoi.html",
       "steps": [
-        { "label": "chezmoi source dir symlinked to dotfiles/ and applied", "status": "done" },
-        { "label": "Add managed files (fish, tmux)", "status": "done" },
-        { "label": "Push to skyrise repo", "status": "done" },
-        { "label": "Document `chezmoi init --apply` bootstrap for a brand-new host", "status": "done" }
+        {
+          "label": "chezmoi source dir symlinked to dotfiles/ and applied",
+          "status": "done"
+        },
+        {
+          "label": "Add managed files (fish, tmux)",
+          "status": "done"
+        },
+        {
+          "label": "Push to skyrise repo",
+          "status": "done"
+        },
+        {
+          "label": "Document `chezmoi init --apply` bootstrap for a brand-new host",
+          "status": "done"
+        }
       ]
     },
     {
       "id": "tailscale-dashboard",
       "title": "Dashboard hosting (Tailscale)",
       "status": "done",
-      "summary": "Serve this dashboard privately over the tailnet — reachable from box and the MacBook, never public. Live at https://box.tail2b3f17.ts.net/",
+      "summary": "Serve this dashboard privately over the tailnet \u2014 reachable from box and the MacBook, never public. Live at https://box.tail2b3f17.ts.net/",
       "learn": "learn/tailscale.html",
       "steps": [
-        { "label": "systemd --user unit serving dashboard/ over localhost (+ linger enabled)", "status": "done" },
-        { "label": "tailscale serve to publish it on the tailnet only", "status": "done" },
-        { "label": "Verify reachable from MacBook via tailnet", "status": "done" }
+        {
+          "label": "systemd --user unit serving dashboard/ over localhost (+ linger enabled)",
+          "status": "done"
+        },
+        {
+          "label": "tailscale serve to publish it on the tailnet only",
+          "status": "done"
+        },
+        {
+          "label": "Verify reachable from MacBook via tailnet",
+          "status": "done"
+        }
       ]
     },
     {
       "id": "droppdd",
       "title": "droppdd (validation project)",
       "status": "done",
-      "summary": "Aggressive fitness/coaching app (keto, OMAD, guided workouts, AI meal planning) — scaffolded using everything above, proving the toolchain end to end. github.com/nunchimangchi-dev/droppdd",
+      "summary": "Aggressive fitness/coaching app (keto, OMAD, guided workouts, AI meal planning) \u2014 scaffolded using everything above, proving the toolchain end to end. github.com/nunchimangchi-dev/droppdd",
       "learn": "learn/droppdd.html",
       "steps": [
-        { "label": "Create ~/Projects/droppdd via the documented process", "status": "done" },
-        { "label": "Next.js scaffold + repo + CI lint workflow", "status": "done" },
-        { "label": "Push to GitHub via SSH (no password prompt)", "status": "done" }
+        {
+          "label": "Create ~/Projects/droppdd via the documented process",
+          "status": "done"
+        },
+        {
+          "label": "Next.js scaffold + repo + CI lint workflow",
+          "status": "done"
+        },
+        {
+          "label": "Push to GitHub via SSH (no password prompt)",
+          "status": "done"
+        }
       ]
     }
   ],
@@ -153,11 +318,26 @@
         "status": "done",
         "summary": "Started as DATABROKER.deep, renamed unbrokerrdd - a Go CLI/dashboard automating data-broker opt-out requests. Real module path, CI, and a cost-reduction pre-check ahead of the paid vision-verification step.",
         "steps": [
-          { "label": "Go module path fixed to github.com/nunchimangchi-dev/unbrokerrdd (go install works for third parties)", "status": "done" },
-          { "label": "Go toolchain bumped 1.26 -> 1.26.7, fixed 18 real stdlib CVEs (govulncheck: 18 -> 0)", "status": "done" },
-          { "label": "govulncheck added to CI", "status": "done" },
-          { "label": "domText fast-path pre-check added before Claude vision API calls - real test coverage, asymmetric by design (only short-circuits on failure signals, never success, since false-success is worse than false-failure for a privacy tool)", "status": "done" },
-          { "label": "SECURITY-BASELINE.md written, corrected on the spot after a wrong initial claim (rate limiting was already real, via time.After)", "status": "done" }
+          {
+            "label": "Go module path fixed to github.com/nunchimangchi-dev/unbrokerrdd (go install works for third parties)",
+            "status": "done"
+          },
+          {
+            "label": "Go toolchain bumped 1.26 -> 1.26.7, fixed 18 real stdlib CVEs (govulncheck: 18 -> 0)",
+            "status": "done"
+          },
+          {
+            "label": "govulncheck added to CI",
+            "status": "done"
+          },
+          {
+            "label": "domText fast-path pre-check added before Claude vision API calls - real test coverage, asymmetric by design (only short-circuits on failure signals, never success, since false-success is worse than false-failure for a privacy tool)",
+            "status": "done"
+          },
+          {
+            "label": "SECURITY-BASELINE.md written, corrected on the spot after a wrong initial claim (rate limiting was already real, via time.After)",
+            "status": "done"
+          }
         ]
       },
       {
@@ -167,9 +347,18 @@
         "pr": "https://github.com/nunchimangchi-dev/unbrokerrdd/pull/1",
         "summary": "CCPA authorized-agent grounding (Cal. Civ. Code 1798.135, 11 CCR 7063) and the Delete Act/DROP platform - Gemini-drafted, independently verified against primary sources (privacy.ca.gov/drop, peopleconnect.us terms), one citation corrected, two unverified stats flagged rather than presented as fact.",
         "steps": [
-          { "label": "Research pass with explicit primary-source citation requirements", "status": "done" },
-          { "label": "Verified citations directly via WebFetch against primary sources; corrected one, flagged two unverified stats", "status": "done" },
-          { "label": "PR #1 merged", "status": "done" }
+          {
+            "label": "Research pass with explicit primary-source citation requirements",
+            "status": "done"
+          },
+          {
+            "label": "Verified citations directly via WebFetch against primary sources; corrected one, flagged two unverified stats",
+            "status": "done"
+          },
+          {
+            "label": "PR #1 merged",
+            "status": "done"
+          }
         ]
       },
       {
@@ -178,12 +367,30 @@
         "status": "done",
         "summary": "Three design passes took the dashboard from a generic blue/indigo/purple AI-SaaS look, through a hacker-terminal-HUD detour, to a calm sage/forest-green palette grounded in two real dashboard references - each pass verified by actually rendering it, not by trusting the handoff notes.",
         "steps": [
-          { "label": "Pass 1: removed the Three.js/CDN particle background and dead code", "status": "done" },
-          { "label": "Pass 2: removed hacker-terminal styling (ALL_CAPS jargon, scrolling console log, radar sweep) and .exe branding, replaced with sentence-case trust-oriented language", "status": "done" },
-          { "label": "Pass 3: replaced the blue-indigo-purple palette with a sage/forest-green/cream system", "status": "done" },
-          { "label": "Caught and fixed an incomplete refactor: ~13 hardcoded rgba() values from the old palette survived in badges/status colors despite the token definitions being updated", "status": "done" },
-          { "label": "Replaced the radar/scatter-dot panel (still read as sci-fi surveillance chrome even after recoloring) with a circular \"Protection Status\" progress ring", "status": "done" },
-          { "label": "PR #2 merged to main", "status": "done" }
+          {
+            "label": "Pass 1: removed the Three.js/CDN particle background and dead code",
+            "status": "done"
+          },
+          {
+            "label": "Pass 2: removed hacker-terminal styling (ALL_CAPS jargon, scrolling console log, radar sweep) and .exe branding, replaced with sentence-case trust-oriented language",
+            "status": "done"
+          },
+          {
+            "label": "Pass 3: replaced the blue-indigo-purple palette with a sage/forest-green/cream system",
+            "status": "done"
+          },
+          {
+            "label": "Caught and fixed an incomplete refactor: ~13 hardcoded rgba() values from the old palette survived in badges/status colors despite the token definitions being updated",
+            "status": "done"
+          },
+          {
+            "label": "Replaced the radar/scatter-dot panel (still read as sci-fi surveillance chrome even after recoloring) with a circular \"Protection Status\" progress ring",
+            "status": "done"
+          },
+          {
+            "label": "PR #2 merged to main",
+            "status": "done"
+          }
         ]
       },
       {
@@ -192,9 +399,18 @@
         "status": "done",
         "summary": "Considered Tailscale Funnel first for a fast public link, rejected for not being memorable. Deployed instead to its own isolated LXC, public at unbrokerrdd.alwaysgivealwaysget.com, gated by Cloudflare Access at the edge.",
         "steps": [
-          { "label": "Dashboard's hardcoded loopback-only bind made configurable (DATABROKERGO_BIND) so it can listen on a real interface behind the tunnel - loopback stays the default for local/personal use", "status": "done" },
-          { "label": "Deployed to its own isolated VLAN20 LXC, added to web01's Cloudflare Tunnel as a new ingress hostname + DNS record", "status": "done" },
-          { "label": "Cloudflare Access gate verified live end-to-end (real email-OTP login page on the actual public domain)", "status": "done" }
+          {
+            "label": "Dashboard's hardcoded loopback-only bind made configurable (DATABROKERGO_BIND) so it can listen on a real interface behind the tunnel - loopback stays the default for local/personal use",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to its own isolated VLAN20 LXC, added to web01's Cloudflare Tunnel as a new ingress hostname + DNS record",
+            "status": "done"
+          },
+          {
+            "label": "Cloudflare Access gate verified live end-to-end (real email-OTP login page on the actual public domain)",
+            "status": "done"
+          }
         ]
       },
       {
@@ -204,12 +420,30 @@
         "pr": "https://github.com/nunchimangchi-dev/unbrokerrdd/pull/3",
         "summary": "The dashboard had zero identity/auth of its own before this - now trusts Cloudflare Access's authenticated-user header (no redundant login system, fits the single-tenant architecture) with a real viewer/admin role split. Backend delivered by Gemini and verified directly (real passing tests, correct last-admin invariant); the actual admin UI shipped with zero frontend, so that was built directly instead of trusting a second blind Gemini pass.",
         "steps": [
-          { "label": "Identity middleware trusts Cf-Access-Authenticated-User-Email; allowed_users/subject_profile tables; UNBROKERRDD_ADMIN_EMAIL bootstrap avoids a first-boot lockout", "status": "done" },
-          { "label": "Run control (/api/batch, mutex-guarded), per-broker retry (/api/reset), PII profile (/api/profile), access management (/api/users, last-admin invariant enforced) - every handler independently re-checks admin role", "status": "done" },
-          { "label": "Real test suite added (server_test.go) - run and verified directly, not just trusted from HANDOFF.md", "status": "done" },
-          { "label": "Admin UI (static/admin.html, role-gated nav link + per-broker retry button in index.html) built directly after finding Gemini shipped backend only - visually verified live via browser before committing", "status": "done" },
-          { "label": "Deployed live: bootstrap confirmed (nunchimangchi@icloud.com seeded as first admin), Cloudflare Access gate verified on the real public admin.html", "status": "done" },
-          { "label": "Found, not yet fixed: index.html hardcodes ws://localhost:8080/ws for its live WebSocket - fails on the real domain, silently falls back to client-side demo simulation instead of showing real broker data", "status": "todo" }
+          {
+            "label": "Identity middleware trusts Cf-Access-Authenticated-User-Email; allowed_users/subject_profile tables; UNBROKERRDD_ADMIN_EMAIL bootstrap avoids a first-boot lockout",
+            "status": "done"
+          },
+          {
+            "label": "Run control (/api/batch, mutex-guarded), per-broker retry (/api/reset), PII profile (/api/profile), access management (/api/users, last-admin invariant enforced) - every handler independently re-checks admin role",
+            "status": "done"
+          },
+          {
+            "label": "Real test suite added (server_test.go) - run and verified directly, not just trusted from HANDOFF.md",
+            "status": "done"
+          },
+          {
+            "label": "Admin UI (static/admin.html, role-gated nav link + per-broker retry button in index.html) built directly after finding Gemini shipped backend only - visually verified live via browser before committing",
+            "status": "done"
+          },
+          {
+            "label": "Deployed live: bootstrap confirmed (nunchimangchi@icloud.com seeded as first admin), Cloudflare Access gate verified on the real public admin.html",
+            "status": "done"
+          },
+          {
+            "label": "Found, not yet fixed: index.html hardcodes ws://localhost:8080/ws for its live WebSocket - fails on the real domain, silently falls back to client-side demo simulation instead of showing real broker data",
+            "status": "todo"
+          }
         ]
       }
     ]
@@ -224,11 +458,26 @@
         "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/1",
         "summary": "Persistent nav, dashboard, workouts, meals, and progress pages - built on mock data first, then migrated onto a real Prisma/SQLite database.",
         "steps": [
-          { "label": "App shell built via Gemini CLI (mock data, 4 pages + workout tracker)", "status": "done" },
-          { "label": "Migrated to Prisma + SQLite via Gemini CLI", "status": "done" },
-          { "label": "Fixed a .gitignore bug that would've committed the generated Prisma client", "status": "done" },
-          { "label": "Fixed CI (postinstall prisma generate, migrate deploy + seed steps)", "status": "done" },
-          { "label": "PR #1 merged to main", "status": "done" }
+          {
+            "label": "App shell built via Gemini CLI (mock data, 4 pages + workout tracker)",
+            "status": "done"
+          },
+          {
+            "label": "Migrated to Prisma + SQLite via Gemini CLI",
+            "status": "done"
+          },
+          {
+            "label": "Fixed a .gitignore bug that would've committed the generated Prisma client",
+            "status": "done"
+          },
+          {
+            "label": "Fixed CI (postinstall prisma generate, migrate deploy + seed steps)",
+            "status": "done"
+          },
+          {
+            "label": "PR #1 merged to main",
+            "status": "done"
+          }
         ]
       },
       {
@@ -238,12 +487,30 @@
         "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/2",
         "summary": "Google-only sign-in via Auth.js v5, gated by an allowlist table - every route protected except the sign-in page itself.",
         "steps": [
-          { "label": "Auth.js v5 + Prisma adapter (implemented directly - gemini's headless mode couldn't run shell/file tools)", "status": "done" },
-          { "label": "AllowedEmail table gates who can actually sign in", "status": "done" },
-          { "label": "proxy.ts protects every route (Next 16 renamed middleware.js to proxy.js)", "status": "done" },
-          { "label": "Fixed CI (stale @prisma/client type-export bug, same failure class as the data layer)", "status": "done" },
-          { "label": "Real end-to-end Google sign-in verified live; fixed a redirect_uri_mismatch behind tailscale serve", "status": "done" },
-          { "label": "PR #2 merged to main", "status": "done" }
+          {
+            "label": "Auth.js v5 + Prisma adapter (implemented directly - gemini's headless mode couldn't run shell/file tools)",
+            "status": "done"
+          },
+          {
+            "label": "AllowedEmail table gates who can actually sign in",
+            "status": "done"
+          },
+          {
+            "label": "proxy.ts protects every route (Next 16 renamed middleware.js to proxy.js)",
+            "status": "done"
+          },
+          {
+            "label": "Fixed CI (stale @prisma/client type-export bug, same failure class as the data layer)",
+            "status": "done"
+          },
+          {
+            "label": "Real end-to-end Google sign-in verified live; fixed a redirect_uri_mismatch behind tailscale serve",
+            "status": "done"
+          },
+          {
+            "label": "PR #2 merged to main",
+            "status": "done"
+          }
         ]
       },
       {
@@ -253,12 +520,30 @@
         "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/3",
         "summary": "Mobile bottom nav got crowded once sign-out landed there as a 5th item; /signin was bare. Cosmetic only, no logic changes.",
         "steps": [
-          { "label": "Prompt drafted (docs/GEMINI-DESIGN-PASS-PROMPT.md)", "status": "done" },
-          { "label": "Run via gemini interactively (gemini-3-flash-preview)", "status": "done" },
-          { "label": "Sign-out relocated to mobile top header; bottom nav back to 4 items", "status": "done" },
-          { "label": "Sign-in page redesigned; page headers on Dashboard/Workouts/Meals given real visual weight", "status": "done" },
-          { "label": "Human review caught + fixed a duplicated \"REPS REPS\" bug on the dashboard WOD card", "status": "done" },
-          { "label": "PR #3 merged to main", "status": "done" }
+          {
+            "label": "Prompt drafted (docs/GEMINI-DESIGN-PASS-PROMPT.md)",
+            "status": "done"
+          },
+          {
+            "label": "Run via gemini interactively (gemini-3-flash-preview)",
+            "status": "done"
+          },
+          {
+            "label": "Sign-out relocated to mobile top header; bottom nav back to 4 items",
+            "status": "done"
+          },
+          {
+            "label": "Sign-in page redesigned; page headers on Dashboard/Workouts/Meals given real visual weight",
+            "status": "done"
+          },
+          {
+            "label": "Human review caught + fixed a duplicated \"REPS REPS\" bug on the dashboard WOD card",
+            "status": "done"
+          },
+          {
+            "label": "PR #3 merged to main",
+            "status": "done"
+          }
         ]
       },
       {
@@ -268,11 +553,26 @@
         "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/4",
         "summary": "droppdd now runs as a real systemd --user service with its own tailscale serve slot (8443) - no more manually starting npm run start and stealing the dashboard's slot for every test.",
         "steps": [
-          { "label": "systemd --user unit (droppdd.service) running production npm run start on port 3001", "status": "done" },
-          { "label": "tailscale serve on its own port (8443) - coexists with the dashboard's 443/8787", "status": "done" },
-          { "label": "Production AUTH_URL set in the service's own environment, not the shared dev .env", "status": "done" },
-          { "label": "Real end-to-end Google sign-in verified live against the deployed URL", "status": "done" },
-          { "label": "PR #4 merged to main", "status": "done" }
+          {
+            "label": "systemd --user unit (droppdd.service) running production npm run start on port 3001",
+            "status": "done"
+          },
+          {
+            "label": "tailscale serve on its own port (8443) - coexists with the dashboard's 443/8787",
+            "status": "done"
+          },
+          {
+            "label": "Production AUTH_URL set in the service's own environment, not the shared dev .env",
+            "status": "done"
+          },
+          {
+            "label": "Real end-to-end Google sign-in verified live against the deployed URL",
+            "status": "done"
+          },
+          {
+            "label": "PR #4 merged to main",
+            "status": "done"
+          }
         ]
       },
       {
@@ -282,15 +582,42 @@
         "pr": "https://github.com/nunchimangchi-dev/droppdd/pull/6",
         "summary": "Put your \"money\" where your mouth is - wager against yourself (or eventually another user) on a fitness goal. Honor system first; real money + charity payouts is the end state.",
         "steps": [
-          { "label": "Roadmap + legal/safety constraints written up (docs/FUTURE-WAGERS.md)", "status": "done" },
-          { "label": "Wager data model - schema + migration only, no UI yet (PR #5 merged)", "status": "done" },
-          { "label": "Scoped Progress/WeightRecord to userId - were global singletons, inconsistent with Wager (PR #6 merged)", "status": "done" },
-          { "label": "Creation flow with the goal-aggressiveness guardrail enforced (PR #6 merged)", "status": "done" },
-          { "label": "Resolution logic tied to existing Progress/WeightRecord data (PR #6 merged)", "status": "done" },
-          { "label": "Phase 1 complete: solo commitment contracts, honor system, no money", "status": "done" },
-          { "label": "Found by an ultrareview pass against merged PR #6: metric enum + targetValue NaN weren't validated - PR #7 opened to fix it directly, then found already fixed by the later Zod schema in the security-baseline commit (createWagerSchema enforces the enum and .finite()); PR #7 closed as superseded rather than merged into a conflict", "status": "done" },
-          { "label": "Phase 2: peer wagers, still no money", "status": "todo" },
-          { "label": "Phase 3: real money, solo only (legal review required first)", "status": "todo" }
+          {
+            "label": "Roadmap + legal/safety constraints written up (docs/FUTURE-WAGERS.md)",
+            "status": "done"
+          },
+          {
+            "label": "Wager data model - schema + migration only, no UI yet (PR #5 merged)",
+            "status": "done"
+          },
+          {
+            "label": "Scoped Progress/WeightRecord to userId - were global singletons, inconsistent with Wager (PR #6 merged)",
+            "status": "done"
+          },
+          {
+            "label": "Creation flow with the goal-aggressiveness guardrail enforced (PR #6 merged)",
+            "status": "done"
+          },
+          {
+            "label": "Resolution logic tied to existing Progress/WeightRecord data (PR #6 merged)",
+            "status": "done"
+          },
+          {
+            "label": "Phase 1 complete: solo commitment contracts, honor system, no money",
+            "status": "done"
+          },
+          {
+            "label": "Found by an ultrareview pass against merged PR #6: metric enum + targetValue NaN weren't validated - PR #7 opened to fix it directly, then found already fixed by the later Zod schema in the security-baseline commit (createWagerSchema enforces the enum and .finite()); PR #7 closed as superseded rather than merged into a conflict",
+            "status": "done"
+          },
+          {
+            "label": "Phase 2: peer wagers, still no money",
+            "status": "todo"
+          },
+          {
+            "label": "Phase 3: real money, solo only (legal review required first)",
+            "status": "todo"
+          }
         ]
       },
       {
@@ -299,9 +626,18 @@
         "status": "done",
         "summary": "Second cosmetic pass, refactored the wagers page along the way. Direct commits to main, no PR.",
         "steps": [
-          { "label": "Prompt drafted for Gemini design pass 2", "status": "done" },
-          { "label": "Bold high-contrast visual system implemented, wagers page refactored", "status": "done" },
-          { "label": "Merged to main", "status": "done" }
+          {
+            "label": "Prompt drafted for Gemini design pass 2",
+            "status": "done"
+          },
+          {
+            "label": "Bold high-contrast visual system implemented, wagers page refactored",
+            "status": "done"
+          },
+          {
+            "label": "Merged to main",
+            "status": "done"
+          }
         ]
       },
       {
@@ -310,9 +646,18 @@
         "status": "done",
         "summary": "Same balanced-security-practices pass applied across every project this cycle: Zod input validation, an npm audit CI gate, and a legal-draft prompt for future ToS/legal review.",
         "steps": [
-          { "label": "Zod validation added", "status": "done" },
-          { "label": "npm audit CI gate added", "status": "done" },
-          { "label": "Legal-draft prompt written", "status": "done" }
+          {
+            "label": "Zod validation added",
+            "status": "done"
+          },
+          {
+            "label": "npm audit CI gate added",
+            "status": "done"
+          },
+          {
+            "label": "Legal-draft prompt written",
+            "status": "done"
+          }
         ]
       },
       {
@@ -321,10 +666,22 @@
         "status": "done",
         "summary": "Separate LXC (droppdd-staging, VMID 102, VLAN20, its own Tailscale identity) with its own disposable SQLite DB and systemd service - no more testing against production or borrowing the production port.",
         "steps": [
-          { "label": "droppdd-staging LXC provisioned on the isolated VLAN20", "status": "done" },
-          { "label": "Own SQLite DB, seeded independently - disposable, never copied from prod", "status": "done" },
-          { "label": "Own systemd --user service, own tailscale serve slot (8443), same Google OAuth client with a second redirect URI", "status": "done" },
-          { "label": "docs/STAGING.md documents the manual deploy-to-staging steps", "status": "done" }
+          {
+            "label": "droppdd-staging LXC provisioned on the isolated VLAN20",
+            "status": "done"
+          },
+          {
+            "label": "Own SQLite DB, seeded independently - disposable, never copied from prod",
+            "status": "done"
+          },
+          {
+            "label": "Own systemd --user service, own tailscale serve slot (8443), same Google OAuth client with a second redirect URI",
+            "status": "done"
+          },
+          {
+            "label": "docs/STAGING.md documents the manual deploy-to-staging steps",
+            "status": "done"
+          }
         ]
       },
       {
@@ -333,11 +690,26 @@
         "status": "done",
         "summary": "Production had been running directly on box (systemd --user, tailscale serve only - not memorable, not reachable by web01's tunnel without breaking VLAN isolation). Migrated the real database and secrets to a new isolated LXC (droppdd-prod), now public at droppdd.alwaysgivealwaysget.com, gated by Cloudflare Access in front of its existing Google OAuth + allowlist.",
         "steps": [
-          { "label": "New isolated VLAN20 LXC (droppdd-prod) provisioned, same pattern as web01/droppdd-staging", "status": "done" },
-          { "label": "Real production DB + secrets copied over (not a fresh reseed); `prisma migrate deploy` confirmed zero pending migrations post-copy", "status": "done" },
-          { "label": "AUTH_URL updated for the new domain; added to web01's Cloudflare Tunnel as a new ingress hostname + DNS record", "status": "done" },
-          { "label": "Cloudflare Access gate verified live end-to-end (real email-OTP login page on the actual public domain, ahead of droppdd's own sign-in)", "status": "done" },
-          { "label": "Update the Google OAuth client's authorized redirect URIs for the new domain (human-only step, Bitwarden-held credentials)", "status": "todo" }
+          {
+            "label": "New isolated VLAN20 LXC (droppdd-prod) provisioned, same pattern as web01/droppdd-staging",
+            "status": "done"
+          },
+          {
+            "label": "Real production DB + secrets copied over (not a fresh reseed); `prisma migrate deploy` confirmed zero pending migrations post-copy",
+            "status": "done"
+          },
+          {
+            "label": "AUTH_URL updated for the new domain; added to web01's Cloudflare Tunnel as a new ingress hostname + DNS record",
+            "status": "done"
+          },
+          {
+            "label": "Cloudflare Access gate verified live end-to-end (real email-OTP login page on the actual public domain, ahead of droppdd's own sign-in)",
+            "status": "done"
+          },
+          {
+            "label": "Update the Google OAuth client's authorized redirect URIs for the new domain (human-only step, Bitwarden-held credentials)",
+            "status": "todo"
+          }
         ]
       },
       {
@@ -346,12 +718,30 @@
         "status": "done",
         "summary": "First step of a 3-phase expansion (multi-user infra -> AI meal planning -> leaderboard, deliberately sequenced since a leaderboard is meaningless without real users on it). Found and fixed a real data-isolation bug along the way: the home dashboard queried Progress with no userId filter at all, meaning every signed-in user saw whichever row happened to be first in the table - invisible with one real user, would have leaked data across people the moment a second beta user signed in.",
         "steps": [
-          { "label": "Fixed the unscoped prisma.progress.findFirst() bug in page.tsx - now session-derived userId, matching the already-correct pattern in progress/page.tsx and wagers/page.tsx", "status": "done" },
-          { "label": "Built real self-service onboarding (/onboarding + a Zod-validated server action) - previously a new user hit a dead-end \"no progress data\" wall with no way through it", "status": "done" },
-          { "label": "Fixed Navbar's hardcoded \"12 DAYS STRONG\" streak - now threaded per-user through layout.tsx, same pattern already used for isAdmin", "status": "done" },
-          { "label": "Beta-slot counter added to the admin panel (X / 10, soft warning only - a product framing device, not a hard technical cap)", "status": "done" },
-          { "label": "Driven via Gemini in real interactive mode over tmux (not blind headless -p, not unattended --yolo) - Claude watched and approved each tool action live, then independently re-verified the security-critical diffs (session scoping, Zod validation, double-onboarding guard) after the fact", "status": "done" },
-          { "label": "npm run build and npm run lint both passed live during the run; deployed to droppdd-prod and verified (307 auth redirect confirmed on the real host)", "status": "done" }
+          {
+            "label": "Fixed the unscoped prisma.progress.findFirst() bug in page.tsx - now session-derived userId, matching the already-correct pattern in progress/page.tsx and wagers/page.tsx",
+            "status": "done"
+          },
+          {
+            "label": "Built real self-service onboarding (/onboarding + a Zod-validated server action) - previously a new user hit a dead-end \"no progress data\" wall with no way through it",
+            "status": "done"
+          },
+          {
+            "label": "Fixed Navbar's hardcoded \"12 DAYS STRONG\" streak - now threaded per-user through layout.tsx, same pattern already used for isAdmin",
+            "status": "done"
+          },
+          {
+            "label": "Beta-slot counter added to the admin panel (X / 10, soft warning only - a product framing device, not a hard technical cap)",
+            "status": "done"
+          },
+          {
+            "label": "Driven via Gemini in real interactive mode over tmux (not blind headless -p, not unattended --yolo) - Claude watched and approved each tool action live, then independently re-verified the security-critical diffs (session scoping, Zod validation, double-onboarding guard) after the fact",
+            "status": "done"
+          },
+          {
+            "label": "npm run build and npm run lint both passed live during the run; deployed to droppdd-prod and verified (307 auth redirect confirmed on the real host)",
+            "status": "done"
+          }
         ]
       },
       {
@@ -360,21 +750,90 @@
         "status": "done",
         "summary": "Phase 2 of the beta expansion. The pitch: \"sign up now, use this food list and exercise regimen, expect these results\" - much easier to make that claim once macros and exercise are locked in. One combined generation flow, two entry points: pantry-driven (\"kitchen sink\") and macro-driven (\"let's go shopping\", also returns a grocery list). Deliberately ephemeral - generated meals are never persisted (no Meal row, no DB write at all); saved meals are an explicit future paid-tier feature, not built here.",
         "steps": [
-          { "label": "@google/generative-ai + gemini-1.5-flash, constrained to JSON output at the API level (responseMimeType) as a first defense layer", "status": "done" },
-          { "label": "Session check, Zod-validated input (discriminated union for the two entry points), AND Zod-validated AI output before ever rendering it - the model's JSON response is treated as untrusted input, same as client form data, not trusted because it came back as JSON", "status": "done" },
-          { "label": "Verified directly: zero prisma import anywhere in the action file - the cleanest possible confirmation the ephemeral-only requirement actually holds, not just claimed", "status": "done" },
-          { "label": "Driven via the same tmux-bridged interactive Gemini technique as the multi-user infra phase; caught and corrected one real issue live - it tried to commit as a generic \"Gemini CLI\" git identity after a local-repo identity resolution failure, denied that and set the correct project identity directly instead", "status": "done" },
-          { "label": "npm run build and npm run lint both passed; deployed to droppdd-prod (new npm dependency required npm ci before build, not just build)", "status": "done" },
-          { "label": "GEMINI_API_KEY added to droppdd-prod's .env and confirmed present in the running process's actual environment - feature is fully live end-to-end. Reuses box's own gemini CLI key rather than a dedicated one (deliberate speed tradeoff, tracked as technical debt in decisions below)", "status": "done" }
+          {
+            "label": "@google/generative-ai + gemini-1.5-flash, constrained to JSON output at the API level (responseMimeType) as a first defense layer",
+            "status": "done"
+          },
+          {
+            "label": "Session check, Zod-validated input (discriminated union for the two entry points), AND Zod-validated AI output before ever rendering it - the model's JSON response is treated as untrusted input, same as client form data, not trusted because it came back as JSON",
+            "status": "done"
+          },
+          {
+            "label": "Verified directly: zero prisma import anywhere in the action file - the cleanest possible confirmation the ephemeral-only requirement actually holds, not just claimed",
+            "status": "done"
+          },
+          {
+            "label": "Driven via the same tmux-bridged interactive Gemini technique as the multi-user infra phase; caught and corrected one real issue live - it tried to commit as a generic \"Gemini CLI\" git identity after a local-repo identity resolution failure, denied that and set the correct project identity directly instead",
+            "status": "done"
+          },
+          {
+            "label": "npm run build and npm run lint both passed; deployed to droppdd-prod (new npm dependency required npm ci before build, not just build)",
+            "status": "done"
+          },
+          {
+            "label": "GEMINI_API_KEY added to droppdd-prod's .env and confirmed present in the running process's actual environment - feature is fully live end-to-end. Reuses box's own gemini CLI key rather than a dedicated one (deliberate speed tradeoff, tracked as technical debt in decisions below)",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "username-system",
+        "title": "Required, unique, changeable usernames",
+        "status": "done",
+        "summary": "Scope correction from the maintainer mid-leaderboard-build: privacy needs a real identity layer, not name/email-derived display. Every user now picks a unique username (case-insensitive collision check, casing preserved for display), can change it later via a new /profile page for a fresh optical start, and the Navbar shows @username instead of the raw email. Avatar selection explicitly deferred (\"eventually\") - not built.",
+        "steps": [
+          {
+            "label": "Schema: nullable username column (User.username String? @unique), not non-nullable - a single non-nullable migration would have failed against existing beta users with no username set. Required-ness enforced at the application layer instead, same pattern as the existing onboarding gate",
+            "status": "done"
+          },
+          {
+            "label": "Shared Zod schema + case-insensitive uniqueness check (mode: \"insensitive\" isn't supported on the sqlite datasource, so comparison is done in-memory via .toLowerCase()), reused identically by the picker and the profile change action",
+            "status": "done"
+          },
+          {
+            "label": "New /choose-username gate (forced before dashboard/onboarding/progress/wagers) and new /profile page to change username later, with self-exclusion so re-saving your own username in a different casing doesn't false-positive as taken",
+            "status": "done"
+          },
+          {
+            "label": "Caught on review: /meals, /workouts, and /admin (plus its nested pages) had no in-page username check at all - proxy.ts middleware only verifies \"signed in\", not \"has a username\", so those routes were reachable without one. Sent a follow-up fix; Gemini correctly explained why the check can't live in middleware itself (Edge runtime can't run the Prisma/sqlite adapter) and added explicit per-page gates to all of them instead",
+            "status": "done"
+          },
+          {
+            "label": "npm run build and npm run lint both passed (two commits: the core feature, then the gap-fix)",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to droppdd-prod: prisma migrate deploy (first real prod schema migration this project has needed), prisma generate (migrate deploy alone doesn't regenerate the client - build failed with stale types until this was run), npm run build, systemd restart, verified HTTP 307 (auth gate still intact)",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "peer-wagers",
+        "title": "Peer-to-peer wager challenges",
+        "status": "todo",
+        "summary": "Requested alongside the username correction: track wagers challenged/accepted/won/lost/rejected between users (e.g. \"Warren challenges Dave to a 5k\") on each user's profile. This is Phase 2 of docs/FUTURE-WAGERS.md's own roadmap (\"add peers, still no money\") - the current Wager model is solo-only (no opponent field, status is only ACTIVE/WON/LOST/CANCELLED, no accept/reject flow). Not yet scoped into a GEMINI-*.md prompt.",
+        "steps": [
+          {
+            "label": "Design the schema addition (opponent/challenged user, PENDING/REJECTED status) and accept/reject flow before writing the build prompt",
+            "status": "todo"
+          }
         ]
       },
       {
         "id": "leaderboard",
         "title": "Beta leaderboard",
         "status": "todo",
-        "summary": "Phase 3, deliberately last (needs real beta users on real multi-user infra to mean anything). Privacy decision already made: relative metrics only (% toward goal, streak) - not raw weight or other absolute numbers, for a small trusted beta group of 10.",
+        "summary": "Phase 3, deliberately last. Privacy decision already made: relative metrics only (% toward goal, streak) - not raw weight or other absolute numbers, for a small trusted beta group of 10. Build was started once, then deliberately stopped before any code was written when the maintainer flagged that its planned display-identity logic (name, or email-prefix) was about to be obsolete - now rebuilds on top of the real username system instead. Also now sequenced after peer-wagers.",
         "steps": [
-          { "label": "Build the leaderboard view once real beta users exist", "status": "todo" }
+          {
+            "label": "First attempt stopped cleanly at the git-branch-creation step (no code written) once the username/peer-wager scope correction came in",
+            "status": "done"
+          },
+          {
+            "label": "Rebuild using username as display identity, once peer-wagers is done",
+            "status": "todo"
+          }
         ]
       }
     ]
@@ -389,9 +848,18 @@
         "status": "done",
         "summary": "This was a clone of a public third-party template (santifer/career-ops) still pointing at that repo as origin, with real personal data untracked in the working tree - one git push away from landing in someone else's public GitHub.",
         "steps": [
-          { "label": "Created a new private repo (nunchimangchi-dev/career-ops) the user actually owns", "status": "done" },
-          { "label": "Repointed origin to the private repo, kept the original template as a fetch-only upstream remote (push disabled) rather than discarding template-update capability entirely", "status": "done" },
-          { "label": "Real personal data committed and pushed to the private repo, verified independently via the GitHub API (not just trusting the report)", "status": "done" }
+          {
+            "label": "Created a new private repo (nunchimangchi-dev/career-ops) the user actually owns",
+            "status": "done"
+          },
+          {
+            "label": "Repointed origin to the private repo, kept the original template as a fetch-only upstream remote (push disabled) rather than discarding template-update capability entirely",
+            "status": "done"
+          },
+          {
+            "label": "Real personal data committed and pushed to the private repo, verified independently via the GitHub API (not just trusting the report)",
+            "status": "done"
+          }
         ]
       },
       {
@@ -400,10 +868,22 @@
         "status": "done",
         "summary": "144 files removed under an explicit criterion (never clicked through to an actual application, regardless of date) - not a date cutoff, which would have discarded real signal like an old application that got a response.",
         "steps": [
-          { "label": "Real inventory built before any deletion - exact counts, status-column semantics, named edge cases (a live warm lead, 3 untracked orphan reports) surfaced for explicit decisions rather than folded into the bulk criterion", "status": "done" },
-          { "label": "Both edge cases decided explicitly by the user (kept the live lead, removed the orphans)", "status": "done" },
-          { "label": "Peer session declined to execute off a relayed \"user decided X\" and got the user's own direct confirmation first - correct call, same standard held throughout this project for consequential/hard-to-reverse actions", "status": "done" },
-          { "label": "Learned the hard way that \"this repo has git history\" isn't the same claim as \"these specific files are tracked\" - reports/ and output/ turned out to be gitignored, so this cleanup had no git safety net despite an earlier (wrong) reassurance that it did", "status": "done" }
+          {
+            "label": "Real inventory built before any deletion - exact counts, status-column semantics, named edge cases (a live warm lead, 3 untracked orphan reports) surfaced for explicit decisions rather than folded into the bulk criterion",
+            "status": "done"
+          },
+          {
+            "label": "Both edge cases decided explicitly by the user (kept the live lead, removed the orphans)",
+            "status": "done"
+          },
+          {
+            "label": "Peer session declined to execute off a relayed \"user decided X\" and got the user's own direct confirmation first - correct call, same standard held throughout this project for consequential/hard-to-reverse actions",
+            "status": "done"
+          },
+          {
+            "label": "Learned the hard way that \"this repo has git history\" isn't the same claim as \"these specific files are tracked\" - reports/ and output/ turned out to be gitignored, so this cleanup had no git safety net despite an earlier (wrong) reassurance that it did",
+            "status": "done"
+          }
         ]
       },
       {
@@ -412,41 +892,138 @@
         "status": "done",
         "summary": "Moved off the same generic dark-obsidian/cyan-neon aether-core.css palette unbrokerrdd's first pass also had to move away from, onto a bespoke \"Slate & Steel-Blue\" identity grounded in a real cited reference (Linear's dark theme). Also removed the Chart.js CDN dependency (a live third-party network signal every time a private tool got opened) by vendoring it locally.",
         "steps": [
-          { "label": "Drafted from the real file content (relayed with personal data sanitized to placeholders - the other session's own good judgment, not requested)", "status": "done" },
-          { "label": "Run via Gemini in genuine interactive mode over a tmux session bridged from box - not blind headless -p (tool-restricted) and not unattended --yolo (a real trust decision the auto-mode classifier correctly flagged); Claude watched and approved each tool action live instead", "status": "done" },
-          { "label": "Verified directly after the fact: real scoped commit, complete 205KB Chart.js bundle, JS logic/data/personal-identifier locations all confirmed untouched via diff", "status": "done" },
-          { "label": "Merged to main; push blocked by an expired gh token on that Mac (human re-auth needed, not something to force through non-interactively)", "status": "done" }
+          {
+            "label": "Drafted from the real file content (relayed with personal data sanitized to placeholders - the other session's own good judgment, not requested)",
+            "status": "done"
+          },
+          {
+            "label": "Run via Gemini in genuine interactive mode over a tmux session bridged from box - not blind headless -p (tool-restricted) and not unattended --yolo (a real trust decision the auto-mode classifier correctly flagged); Claude watched and approved each tool action live instead",
+            "status": "done"
+          },
+          {
+            "label": "Verified directly after the fact: real scoped commit, complete 205KB Chart.js bundle, JS logic/data/personal-identifier locations all confirmed untouched via diff",
+            "status": "done"
+          },
+          {
+            "label": "Merged to main; push blocked by an expired gh token on that Mac (human re-auth needed, not something to force through non-interactively)",
+            "status": "done"
+          }
         ]
       }
     ]
   },
   "decisions": [
-    { "title": "skyrise repo is public", "why": "Concrete, current infra/dotfiles work is the resume signal; secrets never live in git so public is safe." },
-    { "title": "Dashboard is Tailscale-only", "why": "Personal build log has no reason to be internet-facing; tailnet already includes box, phone, and the MacBook." },
-    { "title": "chezmoi over stow/plain script", "why": "Needs to reconcile real Linux/macOS differences (paths, package managers) across two hosts with one source of truth." },
-    { "title": "Git commit email is GitHub's noreply address", "why": "Standard privacy practice — keeps the real iCloud address out of public commit metadata." },
-    { "title": "droppdd starts as a Next.js web app", "why": "Fastest path to something usable on a phone browser today; mobile app shell can wrap it later if needed." },
-    { "title": "MagicDNS short hostname deferred", "why": "Would need a systemd-resolved/NetworkManager fix, and Tailscale's auto-cert only covers the full .ts.net name anyway, so a short name would break HTTPS. Not worth it yet — full URL works fine." },
-    { "title": "Reboot verification confirmed full auto-recovery", "why": "Rebooted box and checked the dashboard service, tailscale serve, and tmux-continuum boot-restore against docs/POST-REBOOT-CHECKLIST.md — all came back with zero manual steps, closing out the tmux phase." },
-    { "title": "fish config switched from CachyOS's bundled theme to Starship", "why": "The old config.fish sourced a CachyOS-only package for its prompt, which doesn't exist on macOS — broke the one-source-of-truth goal before the Mac was even involved. Starship is genuinely cross-platform and turned out to already be the Mac's real prompt (it overrides Oh My Zsh's theme in the old .zshrc), so switching preserved the look the user already liked instead of losing it." },
-    { "title": "MacBook Pro bootstrap completed with fish as the default shell", "why": "Full bootstrap run (packages, git/gh identity, chezmoi dotfiles, tmux+tpm, fisher) plus the account-level shell switch — all confirmed with the user directly at each consequential step (dotfiles diff review, killing a pre-existing unrelated tmux session, the sudo/chsh commands run by the user themselves, never by an agent)." },
-    { "title": "Homelab web server exposed only via Cloudflare Tunnel, never port-forwarded", "why": "No inbound firewall holes on the OPNsense edge for a personal project — the tunnel connector makes an outbound-only connection, so there's nothing for a scanner to find regardless of what's running behind it." },
-    { "title": "New webserver LXC gets its own isolated VLAN, not the Proxmox/OPNsense management network", "why": "A publicly-reachable service (even behind a tunnel) shouldn't have L2 access to anything sensitive if it's ever compromised — real segmentation, not just faith in the tunnel." },
-    { "title": "SSH key-based auth set up for Proxmox before doing anything else", "why": "The root password was retrieved from Bitwarden and used directly in the user's own terminal — never pasted into chat, never touched by the agent. Matches the same credential-handling discipline as every other host in this project." },
-    { "title": "Added a narrow firewall exception (port 53 only) from VLAN20 to the AdGuard Home resolver on the mgmt network, instead of rebinding AdGuard to every VLAN", "why": "AdGuard Home was only ever bound to the mgmt interface (192.168.10.1) — VLAN20/30 clients had no working DNS at all. A scoped DNS-only carve-out in the existing isolation rule keeps the rest of the isolation intact rather than widening AdGuard's listen scope." },
-    { "title": "Reset alwaysgivealwaysget.com's zone security_level from under_attack back to medium", "why": "Leftover from the domain's earlier compromised state — it was silently JS-challenging every request, including the tunnel's own traffic, before the new legitimate site could ever be reached." },
-    { "title": "Internal DNS uses int.nunchimangchi.com (real subdomain), not a .lan TLD", "why": "A .lan/.local TLD can never get a publicly-trusted CA cert. A real subdomain that's only ever registered in internal DNS (never published in public DNS) gets valid, no-warning HTTPS internally the technically correct way — and it already matched OPNsense's own existing hostname convention (fw1.int.nunchimangchi.com)." },
-    { "title": "Verified the existing ACME DNS-01 token instead of rotating it on sight", "why": "Found a live Cloudflare-scoped token already wired into OPNsense's ACME client, last used successfully 3 weeks prior — rather than assume it was the deleted/compromised one from the earlier account cleanup, did a real functional test (triggered an actual cert re-sign) to confirm it's a distinct, still-valid token before relying on it." },
-    { "title": "Closed the loop on cert renewal instead of a one-time manual push", "why": "The wildcard cert was renewing correctly but nothing restarted the services using it — OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign — OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps." },
-    { "title": "droppdd and unbrokerrdd moved to real public hosting on memorable subdomains, not Tailscale", "why": "A Tailscale Funnel *.ts.net URL was considered first (fastest path to a public link) but rejected: it isn't memorable, and someone shown droppdd in person has no way to recall or revisit a ts.net address later. Real subdomains of the already-owned alwaysgivealwaysget.com (droppdd.*, unbrokerrdd.*) reuse the proven Cloudflare Tunnel infrastructure from web01, each app on its own isolated VLAN20 LXC per the same isolation principle — not a shortcut, the same pattern extended." },
-    { "title": "droppdd's production instance migrated off box onto its own isolated LXC (droppdd-prod)", "why": "Production had been running as a systemd --user service directly on box, reachable only via tailscale serve — box can't be reached by web01's tunnel without punching a hole through the VLAN20-to-management isolation that's the whole point of this design. Migrated the real database and secrets (not a fresh reseed) onto a new LXC on VLAN20, verified `prisma migrate deploy` reported zero pending migrations post-copy before cutting over." },
-    { "title": "Cloudflare Access gates both public apps, not just app-level login", "why": "unbrokerrdd's dashboard has no authentication of its own at all, and droppdd's own Google OAuth + allowlist only gates the app — neither should be reachable by an unauthenticated request purely on the strength of app code. Access (already enrolled on the account, zero setup cost, one-time-PIN email login) sits in front of the Cloudflare Tunnel and denies unauthenticated requests before they reach either origin. Currently allowlisted: owner only." },
-    { "title": "Per-app admin panel is a tracked requirement, not solved by Cloudflare's dashboard", "why": "Cloudflare Access's own dashboard is the only way to add/remove allowed users right now (see docs/RUNBOOK-ADD-USER-CLOUDFLARE-ACCESS.md) — functional, but explicitly called out as not good enough long-term: it's invisible from either app and doesn't demonstrate real full-stack (L1-L7) ownership of the access-control layer. Backlog: a real admin view in each app, with Access staying on as the outer gate regardless (defense in depth, not a replacement)." },
-    { "title": "unbrokerrdd trusts Cloudflare Access's identity header instead of building its own login", "why": "Unlike droppdd (real multi-user data models, peer wagers coming), unbrokerrdd is single-tenant — one campaign, no per-user data to scope. A second login system (OAuth, password) would duplicate what Access already does at the edge. The app reads Cf-Access-Authenticated-User-Email directly and maps it to a viewer/admin role in its own allowed_users table — safe only because the app has no public port-forward and is unreachable except through the tunnel Access sits in front of." },
-    { "title": "Gemini's unbrokerrdd admin-panel backend was verified directly, then its missing frontend was built by hand rather than re-prompted blind", "why": "The backend pass was genuinely solid — real passing tests, correct last-admin invariant, correct concurrency guard — but shipped zero UI despite the prompt asking for admin views/forms, and HANDOFF.md never flagged the gap. Once a backend contract is stable and well-tested, wiring a UI to it is comparatively low-risk, fast-to-verify work — built directly and visually confirmed live rather than spending another blind Gemini round on it." },
-    { "title": "A second Claude session (network-ops-02) did the HA/OPNsense-ACME work; every specific claim it made was independently re-verified before being treated as done", "why": "Cross-session work isn't self-verifying just because it reads as detailed and confident — the same discipline applied to Gemini's HANDOFF.md claims applies here too. Checked the live cert directly (TLS connection, not trusting the report), then once given scoped OPNsense API access, checked every UUID/config detail named (validation entry zone-scoping, both automation actions, the dual-SSH-key-algorithm workaround) against the real config. Everything matched exactly — a good outcome, but only because it was actually checked, not assumed." },
-    { "title": "OPNsense/AdGuard credentials were handed over as an SSH public key add, not a password or private key over chat", "why": "Box already had an established SSH keypair used for every other host in this project - adding its public key to fw1's authorized_keys via the OPNsense web UI meant no secret ever had to be typed or pasted into the conversation at all, safer than the alternative of relaying a password through chat even though that channel was already being used for other credentials tonight." },
-    { "title": "AdGuard's alwaysgivealwaysget.com rewrite is a single explicit host entry (ha.alwaysgivealwaysget.com), not a wildcard", "why": "First attempt used a wildcard (*.alwaysgivealwaysget.com -> Home Assistant's IP) for convenience - broke droppdd/unbrokerrdd's subdomains for anyone resolving through AdGuard or Tailscale Split DNS (home network, tailnet), since the same domain already has real public subdomains that need to resolve to Cloudflare's tunnel, not to Home Assistant. Caught by explicitly re-testing droppdd/unbrokerrdd after the DNS change rather than assuming a DNS change to one host doesn't affect others under the same domain. Fixed by matching the explicit per-host pattern already used for int.nunchimangchi.com's rewrites." },
-    { "title": "TECH DEBT (tracked, not forgotten): droppdd-prod's GEMINI_API_KEY reuses box's own gemini CLI key rather than a dedicated one", "why": "Deliberate speed tradeoff, made explicitly - user chose to move fast rather than provision a second key, and asked to be reminded later. A shared key means droppdd's real end-user-facing usage and box's own agentic coding/design-pass usage can't be monitored or rate-limited independently - a runaway-cost bug on one side could affect the other, with no clean way to revoke just one. Not urgent (both work fine today), but should be split into two dedicated keys next time this project comes up." }
+    {
+      "title": "skyrise repo is public",
+      "why": "Concrete, current infra/dotfiles work is the resume signal; secrets never live in git so public is safe."
+    },
+    {
+      "title": "Dashboard is Tailscale-only",
+      "why": "Personal build log has no reason to be internet-facing; tailnet already includes box, phone, and the MacBook."
+    },
+    {
+      "title": "chezmoi over stow/plain script",
+      "why": "Needs to reconcile real Linux/macOS differences (paths, package managers) across two hosts with one source of truth."
+    },
+    {
+      "title": "Git commit email is GitHub's noreply address",
+      "why": "Standard privacy practice \u2014 keeps the real iCloud address out of public commit metadata."
+    },
+    {
+      "title": "droppdd starts as a Next.js web app",
+      "why": "Fastest path to something usable on a phone browser today; mobile app shell can wrap it later if needed."
+    },
+    {
+      "title": "MagicDNS short hostname deferred",
+      "why": "Would need a systemd-resolved/NetworkManager fix, and Tailscale's auto-cert only covers the full .ts.net name anyway, so a short name would break HTTPS. Not worth it yet \u2014 full URL works fine."
+    },
+    {
+      "title": "Reboot verification confirmed full auto-recovery",
+      "why": "Rebooted box and checked the dashboard service, tailscale serve, and tmux-continuum boot-restore against docs/POST-REBOOT-CHECKLIST.md \u2014 all came back with zero manual steps, closing out the tmux phase."
+    },
+    {
+      "title": "fish config switched from CachyOS's bundled theme to Starship",
+      "why": "The old config.fish sourced a CachyOS-only package for its prompt, which doesn't exist on macOS \u2014 broke the one-source-of-truth goal before the Mac was even involved. Starship is genuinely cross-platform and turned out to already be the Mac's real prompt (it overrides Oh My Zsh's theme in the old .zshrc), so switching preserved the look the user already liked instead of losing it."
+    },
+    {
+      "title": "MacBook Pro bootstrap completed with fish as the default shell",
+      "why": "Full bootstrap run (packages, git/gh identity, chezmoi dotfiles, tmux+tpm, fisher) plus the account-level shell switch \u2014 all confirmed with the user directly at each consequential step (dotfiles diff review, killing a pre-existing unrelated tmux session, the sudo/chsh commands run by the user themselves, never by an agent)."
+    },
+    {
+      "title": "Homelab web server exposed only via Cloudflare Tunnel, never port-forwarded",
+      "why": "No inbound firewall holes on the OPNsense edge for a personal project \u2014 the tunnel connector makes an outbound-only connection, so there's nothing for a scanner to find regardless of what's running behind it."
+    },
+    {
+      "title": "New webserver LXC gets its own isolated VLAN, not the Proxmox/OPNsense management network",
+      "why": "A publicly-reachable service (even behind a tunnel) shouldn't have L2 access to anything sensitive if it's ever compromised \u2014 real segmentation, not just faith in the tunnel."
+    },
+    {
+      "title": "SSH key-based auth set up for Proxmox before doing anything else",
+      "why": "The root password was retrieved from Bitwarden and used directly in the user's own terminal \u2014 never pasted into chat, never touched by the agent. Matches the same credential-handling discipline as every other host in this project."
+    },
+    {
+      "title": "Added a narrow firewall exception (port 53 only) from VLAN20 to the AdGuard Home resolver on the mgmt network, instead of rebinding AdGuard to every VLAN",
+      "why": "AdGuard Home was only ever bound to the mgmt interface (192.168.10.1) \u2014 VLAN20/30 clients had no working DNS at all. A scoped DNS-only carve-out in the existing isolation rule keeps the rest of the isolation intact rather than widening AdGuard's listen scope."
+    },
+    {
+      "title": "Reset alwaysgivealwaysget.com's zone security_level from under_attack back to medium",
+      "why": "Leftover from the domain's earlier compromised state \u2014 it was silently JS-challenging every request, including the tunnel's own traffic, before the new legitimate site could ever be reached."
+    },
+    {
+      "title": "Internal DNS uses int.nunchimangchi.com (real subdomain), not a .lan TLD",
+      "why": "A .lan/.local TLD can never get a publicly-trusted CA cert. A real subdomain that's only ever registered in internal DNS (never published in public DNS) gets valid, no-warning HTTPS internally the technically correct way \u2014 and it already matched OPNsense's own existing hostname convention (fw1.int.nunchimangchi.com)."
+    },
+    {
+      "title": "Verified the existing ACME DNS-01 token instead of rotating it on sight",
+      "why": "Found a live Cloudflare-scoped token already wired into OPNsense's ACME client, last used successfully 3 weeks prior \u2014 rather than assume it was the deleted/compromised one from the earlier account cleanup, did a real functional test (triggered an actual cert re-sign) to confirm it's a distinct, still-valid token before relying on it."
+    },
+    {
+      "title": "Closed the loop on cert renewal instead of a one-time manual push",
+      "why": "The wildcard cert was renewing correctly but nothing restarted the services using it \u2014 OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign \u2014 OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps."
+    },
+    {
+      "title": "droppdd and unbrokerrdd moved to real public hosting on memorable subdomains, not Tailscale",
+      "why": "A Tailscale Funnel *.ts.net URL was considered first (fastest path to a public link) but rejected: it isn't memorable, and someone shown droppdd in person has no way to recall or revisit a ts.net address later. Real subdomains of the already-owned alwaysgivealwaysget.com (droppdd.*, unbrokerrdd.*) reuse the proven Cloudflare Tunnel infrastructure from web01, each app on its own isolated VLAN20 LXC per the same isolation principle \u2014 not a shortcut, the same pattern extended."
+    },
+    {
+      "title": "droppdd's production instance migrated off box onto its own isolated LXC (droppdd-prod)",
+      "why": "Production had been running as a systemd --user service directly on box, reachable only via tailscale serve \u2014 box can't be reached by web01's tunnel without punching a hole through the VLAN20-to-management isolation that's the whole point of this design. Migrated the real database and secrets (not a fresh reseed) onto a new LXC on VLAN20, verified `prisma migrate deploy` reported zero pending migrations post-copy before cutting over."
+    },
+    {
+      "title": "Cloudflare Access gates both public apps, not just app-level login",
+      "why": "unbrokerrdd's dashboard has no authentication of its own at all, and droppdd's own Google OAuth + allowlist only gates the app \u2014 neither should be reachable by an unauthenticated request purely on the strength of app code. Access (already enrolled on the account, zero setup cost, one-time-PIN email login) sits in front of the Cloudflare Tunnel and denies unauthenticated requests before they reach either origin. Currently allowlisted: owner only."
+    },
+    {
+      "title": "Per-app admin panel is a tracked requirement, not solved by Cloudflare's dashboard",
+      "why": "Cloudflare Access's own dashboard is the only way to add/remove allowed users right now (see docs/RUNBOOK-ADD-USER-CLOUDFLARE-ACCESS.md) \u2014 functional, but explicitly called out as not good enough long-term: it's invisible from either app and doesn't demonstrate real full-stack (L1-L7) ownership of the access-control layer. Backlog: a real admin view in each app, with Access staying on as the outer gate regardless (defense in depth, not a replacement)."
+    },
+    {
+      "title": "unbrokerrdd trusts Cloudflare Access's identity header instead of building its own login",
+      "why": "Unlike droppdd (real multi-user data models, peer wagers coming), unbrokerrdd is single-tenant \u2014 one campaign, no per-user data to scope. A second login system (OAuth, password) would duplicate what Access already does at the edge. The app reads Cf-Access-Authenticated-User-Email directly and maps it to a viewer/admin role in its own allowed_users table \u2014 safe only because the app has no public port-forward and is unreachable except through the tunnel Access sits in front of."
+    },
+    {
+      "title": "Gemini's unbrokerrdd admin-panel backend was verified directly, then its missing frontend was built by hand rather than re-prompted blind",
+      "why": "The backend pass was genuinely solid \u2014 real passing tests, correct last-admin invariant, correct concurrency guard \u2014 but shipped zero UI despite the prompt asking for admin views/forms, and HANDOFF.md never flagged the gap. Once a backend contract is stable and well-tested, wiring a UI to it is comparatively low-risk, fast-to-verify work \u2014 built directly and visually confirmed live rather than spending another blind Gemini round on it."
+    },
+    {
+      "title": "A second Claude session (network-ops-02) did the HA/OPNsense-ACME work; every specific claim it made was independently re-verified before being treated as done",
+      "why": "Cross-session work isn't self-verifying just because it reads as detailed and confident \u2014 the same discipline applied to Gemini's HANDOFF.md claims applies here too. Checked the live cert directly (TLS connection, not trusting the report), then once given scoped OPNsense API access, checked every UUID/config detail named (validation entry zone-scoping, both automation actions, the dual-SSH-key-algorithm workaround) against the real config. Everything matched exactly \u2014 a good outcome, but only because it was actually checked, not assumed."
+    },
+    {
+      "title": "OPNsense/AdGuard credentials were handed over as an SSH public key add, not a password or private key over chat",
+      "why": "Box already had an established SSH keypair used for every other host in this project - adding its public key to fw1's authorized_keys via the OPNsense web UI meant no secret ever had to be typed or pasted into the conversation at all, safer than the alternative of relaying a password through chat even though that channel was already being used for other credentials tonight."
+    },
+    {
+      "title": "AdGuard's alwaysgivealwaysget.com rewrite is a single explicit host entry (ha.alwaysgivealwaysget.com), not a wildcard",
+      "why": "First attempt used a wildcard (*.alwaysgivealwaysget.com -> Home Assistant's IP) for convenience - broke droppdd/unbrokerrdd's subdomains for anyone resolving through AdGuard or Tailscale Split DNS (home network, tailnet), since the same domain already has real public subdomains that need to resolve to Cloudflare's tunnel, not to Home Assistant. Caught by explicitly re-testing droppdd/unbrokerrdd after the DNS change rather than assuming a DNS change to one host doesn't affect others under the same domain. Fixed by matching the explicit per-host pattern already used for int.nunchimangchi.com's rewrites."
+    },
+    {
+      "title": "TECH DEBT (tracked, not forgotten): droppdd-prod's GEMINI_API_KEY reuses box's own gemini CLI key rather than a dedicated one",
+      "why": "Deliberate speed tradeoff, made explicitly - user chose to move fast rather than provision a second key, and asked to be reminded later. A shared key means droppdd's real end-user-facing usage and box's own agentic coding/design-pass usage can't be monitored or rate-limited independently - a runaway-cost bug on one side could affect the other, with no clean way to revoke just one. Not urgent (both work fine today), but should be split into two dedicated keys next time this project comes up."
+    },
+    {
+      "title": "Privacy scope correction: required usernames before leaderboard identity, plus peer wagers",
+      "why": "Mid-build on the leaderboard (before any code was written), the maintainer flagged that display identity needed a real fix first: every user must have a required, unique, changeable username, and the leaderboard should key off that instead of name/email. Also requested tracking peer wager challenges (accepted/won/lost/rejected) on each user's profile - this turned out to be Phase 2 of the project's own existing docs/FUTURE-WAGERS.md roadmap (peer wagers, still no money), not yet built. Avatar selection was explicitly scoped as \"eventually\", not now. Sequencing chosen: username system -> peer wagers -> leaderboard resume, since the leaderboard's identity display depends on the first."
+    }
   ]
 }
