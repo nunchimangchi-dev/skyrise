@@ -927,6 +927,38 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "wagers-ux-audit",
+        "title": "Wagers UX audit (solo + peer-challenge persona walkthrough)",
+        "status": "done",
+        "summary": "Continued the persona walkthrough into /wagers - the newest, most complex flow. Six real findings, all fixed same session, no schema changes needed. Biggest one: accepting a peer challenge was a single click with zero confirmation and used the wrong person's stats in the metric picker; both fixed with a new review/confirm page.",
+        "steps": [
+          {
+            "label": "Metric dropdown showed the challenger's own current stats even when challenging someone else, directly contradicting the helper text below it ('resolved against their progress, not yours') - fixed: dropdown is now generic, creator's stats shown once in a separate reference strip",
+            "status": "done"
+          },
+          {
+            "label": "Accepting a challenge was one click with zero confirmation - new /wagers/respond/[id] review page shows exactly what accepting means (computed against the challenged user's own live progress) before they can confirm",
+            "status": "done"
+          },
+          {
+            "label": "A guardrail-rejected accept (unsafe pace) dumped the user back to a generic /wagers error banner, leaving the challenge PENDING with no visible explanation - now stays in context on the review page with the specific warning and real next steps",
+            "status": "done"
+          },
+          {
+            "label": "Wager creation form wiped itself entirely on any validation error (typo'd username, aggressive pace) - submitted values now echo back through the redirect and prefill the form",
+            "status": "done"
+          },
+          {
+            "label": "Solo vs. peer-challenge mode read as one more optional field, not a real fork - now behind a visible '— OR CHALLENGE SOMEONE ELSE INSTEAD —' divider with its own submit button",
+            "status": "done"
+          },
+          {
+            "label": "Active/resolved wager cards showed bare unlabeled numbers (ambiguous for streak targets) - new formatMetricValue() helper renders '180 LBS' / '30 DAYS' consistently",
+            "status": "done"
+          }
+        ]
       }
     ]
   },
