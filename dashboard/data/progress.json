@@ -270,7 +270,7 @@
       "id": "tailscale-dashboard",
       "title": "Dashboard hosting (Tailscale)",
       "status": "done",
-      "summary": "Serve this dashboard privately over the tailnet \u2014 reachable from box and the MacBook, never public. Live at https://box.tail2b3f17.ts.net/",
+      "summary": "Serve this dashboard privately over the tailnet — reachable from box and the MacBook, never public. Live at https://box.tail2b3f17.ts.net/",
       "learn": "learn/tailscale.html",
       "steps": [
         {
@@ -291,7 +291,7 @@
       "id": "droppdd",
       "title": "droppdd (validation project)",
       "status": "done",
-      "summary": "Aggressive fitness/coaching app (keto, OMAD, guided workouts, AI meal planning) \u2014 scaffolded using everything above, proving the toolchain end to end. github.com/nunchimangchi-dev/droppdd",
+      "summary": "Aggressive fitness/coaching app (keto, OMAD, guided workouts, AI meal planning) — scaffolded using everything above, proving the toolchain end to end. github.com/nunchimangchi-dev/droppdd",
       "learn": "learn/droppdd.html",
       "steps": [
         {
@@ -883,6 +883,50 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "onboarding-ux-audit",
+        "title": "Onboarding UX audit (cold-visitor persona walkthrough)",
+        "status": "in-progress",
+        "summary": "Walked the actual live app end-to-end as a specific persona - \"I got this link/invite from a Reddit post, clicked it, and...\" - rather than reviewing in the abstract. Every finding below was confirmed by reading the real code/config, not assumed. Two related findings (the unstyled AccessDenied error page, and the missing privacy/ToS consent step + new onboarding fields for age/height/meal preference) are tracked in more detail as session memory rather than duplicated here. The audit itself is done; the fixes below are backlog, not yet built.",
+        "steps": [
+          {
+            "label": "Cloudflare Access is allowlisted to one email - by design for now, but means literally no cold visitor can reach the app at all until beta invites open the gate up",
+            "status": "todo"
+          },
+          {
+            "label": "No landing/marketing content anywhere - /signin IS the landing page, asks for a Google OAuth grant before explaining what droppdd even is",
+            "status": "todo"
+          },
+          {
+            "label": "/choose-username never explains the username is publicly visible on the leaderboard and to wager opponents - real risk of picking a throwaway name they'd regret",
+            "status": "todo"
+          },
+          {
+            "label": "/onboarding never reassures that raw weight stays private (only a relative % ever shows publicly) - real friction for a weight-loss app's most sensitive input, right after a signup flow with zero privacy framing",
+            "status": "todo"
+          },
+          {
+            "label": "/onboarding is lbs-only, no kg option - excludes/annoys a chunk of a Reddit-scale audience",
+            "status": "todo"
+          },
+          {
+            "label": "Nothing in the app is viewable until username + onboarding are both complete - no low-commitment \"look around first\" path for a curious cold visitor",
+            "status": "todo"
+          },
+          {
+            "label": "Dashboard's \"FASTING WINDOW (OMAD)\" card - the largest, most prominent element on the homepage - is 100% static mock data (mockOMAD in src/lib/mock-data.ts), presented as a live countdown, identical for every user forever",
+            "status": "todo"
+          },
+          {
+            "label": "\"STREAK 🔥 ACTIVE & STRONG\" and \"0.0 LBS SHED TOTAL\" read oddly at the guaranteed day-one zero state every new user starts at",
+            "status": "todo"
+          },
+          {
+            "label": "\"Today's WOD\" and \"upcoming meal\" are prisma.findFirst() with no filter - the same fixed catalog row for every user, every day, not actually daily or personalized despite the framing",
+            "status": "todo"
+          }
+        ]
       }
     ]
   },
@@ -975,7 +1019,7 @@
     },
     {
       "title": "Git commit email is GitHub's noreply address",
-      "why": "Standard privacy practice \u2014 keeps the real iCloud address out of public commit metadata."
+      "why": "Standard privacy practice — keeps the real iCloud address out of public commit metadata."
     },
     {
       "title": "droppdd starts as a Next.js web app",
@@ -983,79 +1027,79 @@
     },
     {
       "title": "MagicDNS short hostname deferred",
-      "why": "Would need a systemd-resolved/NetworkManager fix, and Tailscale's auto-cert only covers the full .ts.net name anyway, so a short name would break HTTPS. Not worth it yet \u2014 full URL works fine."
+      "why": "Would need a systemd-resolved/NetworkManager fix, and Tailscale's auto-cert only covers the full .ts.net name anyway, so a short name would break HTTPS. Not worth it yet — full URL works fine."
     },
     {
       "title": "Reboot verification confirmed full auto-recovery",
-      "why": "Rebooted box and checked the dashboard service, tailscale serve, and tmux-continuum boot-restore against docs/POST-REBOOT-CHECKLIST.md \u2014 all came back with zero manual steps, closing out the tmux phase."
+      "why": "Rebooted box and checked the dashboard service, tailscale serve, and tmux-continuum boot-restore against docs/POST-REBOOT-CHECKLIST.md — all came back with zero manual steps, closing out the tmux phase."
     },
     {
       "title": "fish config switched from CachyOS's bundled theme to Starship",
-      "why": "The old config.fish sourced a CachyOS-only package for its prompt, which doesn't exist on macOS \u2014 broke the one-source-of-truth goal before the Mac was even involved. Starship is genuinely cross-platform and turned out to already be the Mac's real prompt (it overrides Oh My Zsh's theme in the old .zshrc), so switching preserved the look the user already liked instead of losing it."
+      "why": "The old config.fish sourced a CachyOS-only package for its prompt, which doesn't exist on macOS — broke the one-source-of-truth goal before the Mac was even involved. Starship is genuinely cross-platform and turned out to already be the Mac's real prompt (it overrides Oh My Zsh's theme in the old .zshrc), so switching preserved the look the user already liked instead of losing it."
     },
     {
       "title": "MacBook Pro bootstrap completed with fish as the default shell",
-      "why": "Full bootstrap run (packages, git/gh identity, chezmoi dotfiles, tmux+tpm, fisher) plus the account-level shell switch \u2014 all confirmed with the user directly at each consequential step (dotfiles diff review, killing a pre-existing unrelated tmux session, the sudo/chsh commands run by the user themselves, never by an agent)."
+      "why": "Full bootstrap run (packages, git/gh identity, chezmoi dotfiles, tmux+tpm, fisher) plus the account-level shell switch — all confirmed with the user directly at each consequential step (dotfiles diff review, killing a pre-existing unrelated tmux session, the sudo/chsh commands run by the user themselves, never by an agent)."
     },
     {
       "title": "Homelab web server exposed only via Cloudflare Tunnel, never port-forwarded",
-      "why": "No inbound firewall holes on the OPNsense edge for a personal project \u2014 the tunnel connector makes an outbound-only connection, so there's nothing for a scanner to find regardless of what's running behind it."
+      "why": "No inbound firewall holes on the OPNsense edge for a personal project — the tunnel connector makes an outbound-only connection, so there's nothing for a scanner to find regardless of what's running behind it."
     },
     {
       "title": "New webserver LXC gets its own isolated VLAN, not the Proxmox/OPNsense management network",
-      "why": "A publicly-reachable service (even behind a tunnel) shouldn't have L2 access to anything sensitive if it's ever compromised \u2014 real segmentation, not just faith in the tunnel."
+      "why": "A publicly-reachable service (even behind a tunnel) shouldn't have L2 access to anything sensitive if it's ever compromised — real segmentation, not just faith in the tunnel."
     },
     {
       "title": "SSH key-based auth set up for Proxmox before doing anything else",
-      "why": "The root password was retrieved from Bitwarden and used directly in the user's own terminal \u2014 never pasted into chat, never touched by the agent. Matches the same credential-handling discipline as every other host in this project."
+      "why": "The root password was retrieved from Bitwarden and used directly in the user's own terminal — never pasted into chat, never touched by the agent. Matches the same credential-handling discipline as every other host in this project."
     },
     {
       "title": "Added a narrow firewall exception (port 53 only) from VLAN20 to the AdGuard Home resolver on the mgmt network, instead of rebinding AdGuard to every VLAN",
-      "why": "AdGuard Home was only ever bound to the mgmt interface (192.168.10.1) \u2014 VLAN20/30 clients had no working DNS at all. A scoped DNS-only carve-out in the existing isolation rule keeps the rest of the isolation intact rather than widening AdGuard's listen scope."
+      "why": "AdGuard Home was only ever bound to the mgmt interface (192.168.10.1) — VLAN20/30 clients had no working DNS at all. A scoped DNS-only carve-out in the existing isolation rule keeps the rest of the isolation intact rather than widening AdGuard's listen scope."
     },
     {
       "title": "Reset alwaysgivealwaysget.com's zone security_level from under_attack back to medium",
-      "why": "Leftover from the domain's earlier compromised state \u2014 it was silently JS-challenging every request, including the tunnel's own traffic, before the new legitimate site could ever be reached."
+      "why": "Leftover from the domain's earlier compromised state — it was silently JS-challenging every request, including the tunnel's own traffic, before the new legitimate site could ever be reached."
     },
     {
       "title": "Internal DNS uses int.nunchimangchi.com (real subdomain), not a .lan TLD",
-      "why": "A .lan/.local TLD can never get a publicly-trusted CA cert. A real subdomain that's only ever registered in internal DNS (never published in public DNS) gets valid, no-warning HTTPS internally the technically correct way \u2014 and it already matched OPNsense's own existing hostname convention (fw1.int.nunchimangchi.com)."
+      "why": "A .lan/.local TLD can never get a publicly-trusted CA cert. A real subdomain that's only ever registered in internal DNS (never published in public DNS) gets valid, no-warning HTTPS internally the technically correct way — and it already matched OPNsense's own existing hostname convention (fw1.int.nunchimangchi.com)."
     },
     {
       "title": "Verified the existing ACME DNS-01 token instead of rotating it on sight",
-      "why": "Found a live Cloudflare-scoped token already wired into OPNsense's ACME client, last used successfully 3 weeks prior \u2014 rather than assume it was the deleted/compromised one from the earlier account cleanup, did a real functional test (triggered an actual cert re-sign) to confirm it's a distinct, still-valid token before relying on it."
+      "why": "Found a live Cloudflare-scoped token already wired into OPNsense's ACME client, last used successfully 3 weeks prior — rather than assume it was the deleted/compromised one from the earlier account cleanup, did a real functional test (triggered an actual cert re-sign) to confirm it's a distinct, still-valid token before relying on it."
     },
     {
       "title": "Closed the loop on cert renewal instead of a one-time manual push",
-      "why": "The wildcard cert was renewing correctly but nothing restarted the services using it \u2014 OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign \u2014 OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps."
+      "why": "The wildcard cert was renewing correctly but nothing restarted the services using it — OPNsense's own GUI was silently serving a stale cached cert. Wired the built-in \"restart web UI\" action, and configured a real least-privilege Proxmox API token (Sys.Modify on /nodes/pveopti only) so future renewals auto-push to Proxmox too. Also enabled real HTTPS on AdGuard Home's admin UI (was plain HTTP) and wired its restart into the same chain. Verified with a real re-sign — OPNsense, Proxmox, and AdGuard all picked up the identical new cert serial automatically, no manual steps."
     },
     {
       "title": "droppdd and unbrokerrdd moved to real public hosting on memorable subdomains, not Tailscale",
-      "why": "A Tailscale Funnel *.ts.net URL was considered first (fastest path to a public link) but rejected: it isn't memorable, and someone shown droppdd in person has no way to recall or revisit a ts.net address later. Real subdomains of the already-owned alwaysgivealwaysget.com (droppdd.*, unbrokerrdd.*) reuse the proven Cloudflare Tunnel infrastructure from web01, each app on its own isolated VLAN20 LXC per the same isolation principle \u2014 not a shortcut, the same pattern extended."
+      "why": "A Tailscale Funnel *.ts.net URL was considered first (fastest path to a public link) but rejected: it isn't memorable, and someone shown droppdd in person has no way to recall or revisit a ts.net address later. Real subdomains of the already-owned alwaysgivealwaysget.com (droppdd.*, unbrokerrdd.*) reuse the proven Cloudflare Tunnel infrastructure from web01, each app on its own isolated VLAN20 LXC per the same isolation principle — not a shortcut, the same pattern extended."
     },
     {
       "title": "droppdd's production instance migrated off box onto its own isolated LXC (droppdd-prod)",
-      "why": "Production had been running as a systemd --user service directly on box, reachable only via tailscale serve \u2014 box can't be reached by web01's tunnel without punching a hole through the VLAN20-to-management isolation that's the whole point of this design. Migrated the real database and secrets (not a fresh reseed) onto a new LXC on VLAN20, verified `prisma migrate deploy` reported zero pending migrations post-copy before cutting over."
+      "why": "Production had been running as a systemd --user service directly on box, reachable only via tailscale serve — box can't be reached by web01's tunnel without punching a hole through the VLAN20-to-management isolation that's the whole point of this design. Migrated the real database and secrets (not a fresh reseed) onto a new LXC on VLAN20, verified `prisma migrate deploy` reported zero pending migrations post-copy before cutting over."
     },
     {
       "title": "Cloudflare Access gates both public apps, not just app-level login",
-      "why": "unbrokerrdd's dashboard has no authentication of its own at all, and droppdd's own Google OAuth + allowlist only gates the app \u2014 neither should be reachable by an unauthenticated request purely on the strength of app code. Access (already enrolled on the account, zero setup cost, one-time-PIN email login) sits in front of the Cloudflare Tunnel and denies unauthenticated requests before they reach either origin. Currently allowlisted: owner only."
+      "why": "unbrokerrdd's dashboard has no authentication of its own at all, and droppdd's own Google OAuth + allowlist only gates the app — neither should be reachable by an unauthenticated request purely on the strength of app code. Access (already enrolled on the account, zero setup cost, one-time-PIN email login) sits in front of the Cloudflare Tunnel and denies unauthenticated requests before they reach either origin. Currently allowlisted: owner only."
     },
     {
       "title": "Per-app admin panel is a tracked requirement, not solved by Cloudflare's dashboard",
-      "why": "Cloudflare Access's own dashboard is the only way to add/remove allowed users right now (see docs/RUNBOOK-ADD-USER-CLOUDFLARE-ACCESS.md) \u2014 functional, but explicitly called out as not good enough long-term: it's invisible from either app and doesn't demonstrate real full-stack (L1-L7) ownership of the access-control layer. Backlog: a real admin view in each app, with Access staying on as the outer gate regardless (defense in depth, not a replacement)."
+      "why": "Cloudflare Access's own dashboard is the only way to add/remove allowed users right now (see docs/RUNBOOK-ADD-USER-CLOUDFLARE-ACCESS.md) — functional, but explicitly called out as not good enough long-term: it's invisible from either app and doesn't demonstrate real full-stack (L1-L7) ownership of the access-control layer. Backlog: a real admin view in each app, with Access staying on as the outer gate regardless (defense in depth, not a replacement)."
     },
     {
       "title": "unbrokerrdd trusts Cloudflare Access's identity header instead of building its own login",
-      "why": "Unlike droppdd (real multi-user data models, peer wagers coming), unbrokerrdd is single-tenant \u2014 one campaign, no per-user data to scope. A second login system (OAuth, password) would duplicate what Access already does at the edge. The app reads Cf-Access-Authenticated-User-Email directly and maps it to a viewer/admin role in its own allowed_users table \u2014 safe only because the app has no public port-forward and is unreachable except through the tunnel Access sits in front of."
+      "why": "Unlike droppdd (real multi-user data models, peer wagers coming), unbrokerrdd is single-tenant — one campaign, no per-user data to scope. A second login system (OAuth, password) would duplicate what Access already does at the edge. The app reads Cf-Access-Authenticated-User-Email directly and maps it to a viewer/admin role in its own allowed_users table — safe only because the app has no public port-forward and is unreachable except through the tunnel Access sits in front of."
     },
     {
       "title": "Gemini's unbrokerrdd admin-panel backend was verified directly, then its missing frontend was built by hand rather than re-prompted blind",
-      "why": "The backend pass was genuinely solid \u2014 real passing tests, correct last-admin invariant, correct concurrency guard \u2014 but shipped zero UI despite the prompt asking for admin views/forms, and HANDOFF.md never flagged the gap. Once a backend contract is stable and well-tested, wiring a UI to it is comparatively low-risk, fast-to-verify work \u2014 built directly and visually confirmed live rather than spending another blind Gemini round on it."
+      "why": "The backend pass was genuinely solid — real passing tests, correct last-admin invariant, correct concurrency guard — but shipped zero UI despite the prompt asking for admin views/forms, and HANDOFF.md never flagged the gap. Once a backend contract is stable and well-tested, wiring a UI to it is comparatively low-risk, fast-to-verify work — built directly and visually confirmed live rather than spending another blind Gemini round on it."
     },
     {
       "title": "A second Claude session (network-ops-02) did the HA/OPNsense-ACME work; every specific claim it made was independently re-verified before being treated as done",
-      "why": "Cross-session work isn't self-verifying just because it reads as detailed and confident \u2014 the same discipline applied to Gemini's HANDOFF.md claims applies here too. Checked the live cert directly (TLS connection, not trusting the report), then once given scoped OPNsense API access, checked every UUID/config detail named (validation entry zone-scoping, both automation actions, the dual-SSH-key-algorithm workaround) against the real config. Everything matched exactly \u2014 a good outcome, but only because it was actually checked, not assumed."
+      "why": "Cross-session work isn't self-verifying just because it reads as detailed and confident — the same discipline applied to Gemini's HANDOFF.md claims applies here too. Checked the live cert directly (TLS connection, not trusting the report), then once given scoped OPNsense API access, checked every UUID/config detail named (validation entry zone-scoping, both automation actions, the dual-SSH-key-algorithm workaround) against the real config. Everything matched exactly — a good outcome, but only because it was actually checked, not assumed."
     },
     {
       "title": "OPNsense/AdGuard credentials were handed over as an SSH public key add, not a password or private key over chat",
