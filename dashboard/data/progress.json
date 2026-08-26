@@ -851,16 +851,36 @@
       {
         "id": "leaderboard",
         "title": "Beta leaderboard",
-        "status": "todo",
-        "summary": "Phase 3, deliberately last. Privacy decision already made: relative metrics only (% toward goal, streak) - not raw weight or other absolute numbers, for a small trusted beta group of 10. Build was started once, then deliberately stopped before any code was written when the maintainer flagged that its planned display-identity logic (name, or email-prefix) was about to be obsolete - now rebuilds on top of the real username system instead. Also now sequenced after peer-wagers.",
+        "status": "done",
+        "summary": "Phase 3 of the beta expansion, deliberately last. Relative metrics only (% toward goal, streak) using /progress's own percentage formula verbatim - not reimplemented, so it can't drift. Identity is @username (the leaderboard was paused mid-build once, then rebuilt on top of the username system once that landed, instead of the original name/email-prefix design). Built directly, same as peer-wagers - no schema changes needed here at all.",
         "steps": [
           {
             "label": "First attempt stopped cleanly at the git-branch-creation step (no code written) once the username/peer-wager scope correction came in",
             "status": "done"
           },
           {
-            "label": "Rebuild using username as display identity, once peer-wagers is done",
-            "status": "todo"
+            "label": "New /leaderboard route: same session+username gate as every other route, queries every User with a Progress row, computes the bounded percentage using /progress's exact formula",
+            "status": "done"
+          },
+          {
+            "label": "Self-checked via grep before committing: currentWeight/startWeight/targetWeight/.email only appear inside the query/formula, never in the rendered JSX - display identity is @username only, no email fallback possible (a user without a username can't reach any gated route)",
+            "status": "done"
+          },
+          {
+            "label": "Sorted descending, current user's row highlighted, 0/1-entry empty state handled explicitly",
+            "status": "done"
+          },
+          {
+            "label": "Real LEADERBOARD nav entry added to Navbar.tsx",
+            "status": "done"
+          },
+          {
+            "label": "npm run build and npm run lint both passed; smoke-tested unauthenticated (clean 307, zero compile/runtime errors) before merging",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to droppdd-prod: no schema migration needed this time, npm run build, systemd restart, verified live (HTTP 307)",
+            "status": "done"
           }
         ]
       }
