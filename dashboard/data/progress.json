@@ -995,6 +995,30 @@
             "status": "todo"
           }
         ]
+      },
+      {
+        "id": "meals-ux-audit",
+        "title": "Meals UX audit (static catalog + AI planner persona walkthrough)",
+        "status": "done",
+        "summary": "Continued the persona walkthrough into /meals. Four real findings, all fixed same session. Biggest one: mealPreference was collected at onboarding but deliberately left unwired to avoid overclaiming - now it actually constrains AI generation, and a real vegetarian option exists in the static catalog for the first time (checked the 3 existing rows directly - every one was meat-based, guaranteed mismatch for any vegetarian beta tester).",
+        "steps": [
+          {
+            "label": "mealPreference (VEGETARIAN/CARNIVORE) now actually constrains the Gemini prompt - previously collected and ignored",
+            "status": "done"
+          },
+          {
+            "label": "Added a real vegetarian catalog meal (checked all 3 existing rows directly: ribeye, salmon, bacon-and-eggs - zero vegetarian options existed) via a new scoped, idempotent upsert script - deliberately not prisma/seed.ts, which was found to wipe Workout/Meal/WeightRecord/Progress before reseeding (fine for dev, would have destroyed real prod check-in history)",
+            "status": "done"
+          },
+          {
+            "label": "Fixed leaked ops-facing error copy - end users were being told to verify process.env.GEMINI_API_KEY on a server they have no access to",
+            "status": "done"
+          },
+          {
+            "label": "60s per-user cooldown on AI generation (new User.lastAiMealGeneratedAt) - guards real billed Gemini API cost on a key already flagged as shared with box's own CLI tooling, spent only on real attempts, not validation failures",
+            "status": "done"
+          }
+        ]
       }
     ]
   },
