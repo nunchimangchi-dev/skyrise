@@ -1000,7 +1000,7 @@
         "id": "meals-ux-audit",
         "title": "Meals UX audit (static catalog + AI planner persona walkthrough)",
         "status": "done",
-        "summary": "Continued the persona walkthrough into /meals. Four real findings, all fixed same session. Biggest one: mealPreference was collected at onboarding but deliberately left unwired to avoid overclaiming - now it actually constrains AI generation, and a real vegetarian option exists in the static catalog for the first time (checked the 3 existing rows directly - every one was meat-based, guaranteed mismatch for any vegetarian beta tester).",
+        "summary": "Continued the persona walkthrough into /meals. Four real findings, all fixed same session. Biggest one: mealPreference was collected at onboarding but deliberately left unwired to avoid overclaiming - now it actually constrains AI generation, and a real vegetarian option exists in the static catalog for the first time (checked the 3 existing rows directly - every one was meat-based, guaranteed mismatch for any vegetarian beta tester). Also closed a request-timeout gap found during a follow-up conversation about AI placement, risk, and cost.",
         "steps": [
           {
             "label": "mealPreference (VEGETARIAN/CARNIVORE) now actually constrains the Gemini prompt - previously collected and ignored",
@@ -1016,6 +1016,10 @@
           },
           {
             "label": "60s per-user cooldown on AI generation (new User.lastAiMealGeneratedAt) - guards real billed Gemini API cost on a key already flagged as shared with box's own CLI tooling, spent only on real attempts, not validation failures",
+            "status": "done"
+          },
+          {
+            "label": "Follow-up from the AI risk/cost discussion: the Gemini call had no request timeout at all (a hung API response left users on the loading spinner forever) - added a 25s timeout (confirmed against the SDK's actual types), and fixed one more missed instance of the same error-leak pattern (raw SDK error message was being echoed straight to the client)",
             "status": "done"
           }
         ]
