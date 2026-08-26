@@ -811,12 +811,40 @@
       {
         "id": "peer-wagers",
         "title": "Peer-to-peer wager challenges",
-        "status": "todo",
-        "summary": "Requested alongside the username correction: track wagers challenged/accepted/won/lost/rejected between users (e.g. \"Warren challenges Dave to a 5k\") on each user's profile. This is Phase 2 of docs/FUTURE-WAGERS.md's own roadmap (\"add peers, still no money\") - the current Wager model is solo-only (no opponent field, status is only ACTIVE/WON/LOST/CANCELLED, no accept/reject flow). Not yet scoped into a GEMINI-*.md prompt.",
+        "status": "done",
+        "summary": "Phase 2 of docs/FUTURE-WAGERS.md's own roadmap (\"add peers, still no money\"). Optional challengedUserId on Wager (null = the original solo behavior, byte-for-byte unchanged), new PENDING/REJECTED statuses, a real authorization check on accept/reject (not just hidden UI), and a goal-aggressiveness guardrail applied at accept-time instead of creation-time since there's no baseline to compute a pace from until the challenged user's own progress is known. Profile page now shows accepted/won/lost/rejected counts for challenges received. Built directly rather than via Gemini CLI - see the steps below.",
         "steps": [
           {
-            "label": "Design the schema addition (opponent/challenged user, PENDING/REJECTED status) and accept/reject flow before writing the build prompt",
-            "status": "todo"
+            "label": "Schema: nullable challengedUserId + named WagerCreator/WagerChallenged relations, startValue made nullable (baseline captured at accept-time for peer challenges, at creation-time for solo - unchanged)",
+            "status": "done"
+          },
+          {
+            "label": "Migration verified safe by reading the generated SQL directly (standard SQLite table-rebuild, copies every existing row's columns forward unchanged) before applying to prod",
+            "status": "done"
+          },
+          {
+            "label": "Gemini CLI attempted this prompt three times and stalled at 30+ minutes with zero tool calls each time - twice on Auto (silently routed to gemini-3.1-pro-preview), once pinned explicitly to gemini-3.5-flash. Since the design was already fully specified in the prompt doc, built it directly instead of retrying further",
+            "status": "done"
+          },
+          {
+            "label": "createWager extended with an optional challengeUsername field; solo-wager code path unchanged and verified by direct diff review",
+            "status": "done"
+          },
+          {
+            "label": "New respondToChallenge action with a real server-side authorization check (challengedUserId must match the session user, not just a hidden button)",
+            "status": "done"
+          },
+          {
+            "label": "Resolution loop extended to also auto-resolve challenges where I'm the one being measured, explicitly excluding challenges I created for someone else (those resolve on their page load, against their data)",
+            "status": "done"
+          },
+          {
+            "label": "npm run build and npm run lint both passed; smoke-tested unauthenticated (/, /wagers, /profile all clean 307 redirects, zero compile/runtime errors in the dev server log) before merging - no browser session available for a full authenticated click-through",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to droppdd-prod: prisma migrate deploy, prisma generate, npm run build, systemd restart, verified live (HTTP 307 on both new/changed routes)",
+            "status": "done"
           }
         ]
       },
@@ -1024,6 +1052,10 @@
     {
       "title": "Privacy scope correction: required usernames before leaderboard identity, plus peer wagers",
       "why": "Mid-build on the leaderboard (before any code was written), the maintainer flagged that display identity needed a real fix first: every user must have a required, unique, changeable username, and the leaderboard should key off that instead of name/email. Also requested tracking peer wager challenges (accepted/won/lost/rejected) on each user's profile - this turned out to be Phase 2 of the project's own existing docs/FUTURE-WAGERS.md roadmap (peer wagers, still no money), not yet built. Avatar selection was explicitly scoped as \"eventually\", not now. Sequencing chosen: username system -> peer wagers -> leaderboard resume, since the leaderboard's identity display depends on the first."
+    },
+    {
+      "title": "Peer-wagers Gemini prompt abandoned after 3 stalls; built directly instead",
+      "why": "The drafted GEMINI-PEER-WAGERS-PROMPT.md prompt stalled at 30+ minutes with zero tool calls on three consecutive attempts - twice on Auto model routing (which silently picked gemini-3.1-pro-preview), once pinned explicitly to gemini-3.5-flash. Every prior Gemini run this session had produced a first tool call within seconds, so this was a genuine anomaly, not normal variance. Since the prompt itself already fully specified the schema, the lifecycle, the authorization check, and the accept-time-vs-creation-time guardrail decision, there was nothing left to gain from a fourth retry - implemented directly against that same spec instead, with the same discipline (build+lint passing, migration SQL read directly before trusting it, unauthenticated smoke test before merging)."
     }
   ]
 }
