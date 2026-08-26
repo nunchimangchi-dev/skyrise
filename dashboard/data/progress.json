@@ -959,6 +959,42 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "daily-checkin",
+        "title": "Daily check-in - the app's core progress loop was missing",
+        "status": "done",
+        "summary": "Continued the persona walkthrough into an area the maintainer raised directly: how do users update their weight after onboarding? Answer, confirmed by grepping the whole codebase: they couldn't. currentStreak was set to 0 at signup and never incremented anywhere, ever - the dashboard/Navbar/leaderboard streak numbers were permanently frozen at 0 for every user, and WEIGHT_TARGET wagers could only ever resolve LOST, never WON, since currentWeight never moved past onboarding. This was the app's actual core premise not functioning past day one.",
+        "steps": [
+          {
+            "label": "Confirmed with the maintainer before building: streak = consecutive calendar days checked in (not tied to workouts or OMAD adherence)",
+            "status": "done"
+          },
+          {
+            "label": "WeightRecord.recordedAt (real DateTime) added alongside the existing cosmetic date string, which has no year and isn't reliable for date math - safe additive migration",
+            "status": "done"
+          },
+          {
+            "label": "New /checkin route + Navbar entry (placed right after Dashboard - now the most important recurring action in the app)",
+            "status": "done"
+          },
+          {
+            "label": "src/lib/streak.ts: UTC calendar-day comparison helpers, same-day re-check-in updates today's entry instead of double-counting or duplicating",
+            "status": "done"
+          },
+          {
+            "label": "currentWeight now actually updates on check-in - leaderboard %, dashboard trend, and wager resolution are all real for the first time",
+            "status": "done"
+          },
+          {
+            "label": "Dashboard check-in CTA added; /progress now sorts weight history by real timestamp instead of row insertion order",
+            "status": "done"
+          },
+          {
+            "label": "Exercise/workout-completion logging explicitly deferred as a future feature per the maintainer's own call - WorkoutTracker's client-side-only checkboxes untouched",
+            "status": "todo"
+          }
+        ]
       }
     ]
   },
@@ -1152,6 +1188,10 @@
     {
       "title": "Peer-wagers Gemini prompt abandoned after 3 stalls; built directly instead",
       "why": "The drafted GEMINI-PEER-WAGERS-PROMPT.md prompt stalled at 30+ minutes with zero tool calls on three consecutive attempts - twice on Auto model routing (which silently picked gemini-3.1-pro-preview), once pinned explicitly to gemini-3.5-flash. Every prior Gemini run this session had produced a first tool call within seconds, so this was a genuine anomaly, not normal variance. Since the prompt itself already fully specified the schema, the lifecycle, the authorization check, and the accept-time-vs-creation-time guardrail decision, there was nothing left to gain from a fourth retry - implemented directly against that same spec instead, with the same discipline (build+lint passing, migration SQL read directly before trusting it, unauthenticated smoke test before merging)."
+    },
+    {
+      "title": "Found and fixed: droppdd's progress-tracking never actually worked past onboarding",
+      "why": "Continuing the persona walkthrough, the maintainer asked directly how users update their weight after signup. Checked the code rather than assume: WeightRecord.create was only ever called once, at onboarding. Further check: currentStreak is set to 0 at onboarding and grepping the entire src tree found zero places anything ever increments it - the streak shown everywhere (dashboard, Navbar, leaderboard) was permanently 0 for every user, and WorkoutTracker's set-completion checkboxes are pure client-side state with no persistence at all. This meant WEIGHT_TARGET wagers could only ever resolve LOST (via time expiry), never WON, since the number they're measured against never moved. Built a real daily check-in flow (streak defined as consecutive check-in days, confirmed with the maintainer first since it wasn't specified) that fixes both weight and streak tracking at once. Exercise-completion logging deliberately left as a tracked future feature per the maintainer's explicit call, not bundled into this fix."
     }
   ]
 }
