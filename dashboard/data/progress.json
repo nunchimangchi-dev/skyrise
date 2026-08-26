@@ -1023,6 +1023,22 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "workouts-ux-audit",
+        "title": "Workouts UX audit (catalog + tracker persona walkthrough)",
+        "status": "done",
+        "summary": "Continued the persona walkthrough into /workouts. Lighter than the others - the dominant issue (zero persistence, nothing survives a refresh) was already found and explicitly deferred as a future feature during the check-in audit, not re-flagged here. One new, independent finding, fixed.",
+        "steps": [
+          {
+            "label": "\"FINISH WORKOUT & CLAIM VICTORY\" required zero completed sets - fired unconditionally on click, letting a user claim victory (full celebration screen, calorie claim) having done nothing. Now disabled until every set across every exercise is checked off, with a live \"N sets left\" hint",
+            "status": "done"
+          },
+          {
+            "label": "Checked the rest-timer's fragile string-matching (.includes(\"120s\")/\"90s\", defaulting to 60s) against real seeded data - not a live bug today, left as-is",
+            "status": "done"
+          }
+        ]
       }
     ]
   },
