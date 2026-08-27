@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-27T21:24:49Z",
+  "updated": "2026-08-27T22:47:31Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1136,6 +1136,38 @@
           },
           {
             "label": "Full click-through actually performed locally before shipping - created, moved, and deleted a real card, not just build/lint. Deployed to droppdd-prod with an explicit confirmation before the migration; verified live",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "meals-provider-swap",
+        "title": "AI meal planning: permanent swap from Gemini to Claude",
+        "status": "done",
+        "summary": "Real outage, not a hypothetical: droppdd-prod's GEMINI_API_KEY is shared with box's own gemini CLI tooling (tracked tech debt since the original AI-meal-planning phase) and ran out of quota, unusable until Saturday. Rather than wait it out, swapped providers entirely on a dedicated key - closes the shared-key tech debt in the same move instead of just riding out this one outage.",
+        "steps": [
+          {
+            "label": "@google/generative-ai -> @anthropic-ai/sdk, model -> claude-haiku-4-5-20251001 (matches gemini-1.5-flash's fast/cheap role). Confirmed the SDK's real request-options timeout shape from installed package types before relying on it",
+            "status": "done"
+          },
+          {
+            "label": "No native JSON-only response mode on Claude (unlike Gemini's responseMimeType) - kept the existing \"raw JSON only\" prompt instruction (Claude follows it reliably) and added a defensive markdown-fence strip before parsing. Existing Zod validation of AI output (already treating it as untrusted) unchanged",
+            "status": "done"
+          },
+          {
+            "label": "Privacy Policy's AI-meal-planning section and the schema comment both updated to name the real processor (Anthropic, not Google) - a stale privacy policy naming the wrong third party would be a real accuracy problem",
+            "status": "done"
+          },
+          {
+            "label": "Found and flagged, not fixed here: npm install surfaced a pre-existing high-severity deepmerge-ts CVE via @prisma/config -> prisma, confirmed unrelated to this change (prisma's own pinned version untouched in the lockfile diff), needs a breaking major-version bump - separate work",
+            "status": "done"
+          },
+          {
+            "label": "Real deploy friction, resolved by verifying rather than assuming: the maintainer reported adding ANTHROPIC_API_KEY to prod twice, but the file's own mtime proved neither edit had actually landed - traced to editing the wrong location, not a code problem. Third attempt confirmed via mtime before proceeding",
+            "status": "done"
+          },
+          {
+            "label": "Real functional round-trip test performed on the live production site (not just build/lint): both entry points - pantry-driven and macro-driven, including grocery-list generation - generated real recipes via Claude, passed the existing Zod schema, and rendered correctly",
             "status": "done"
           }
         ]
