@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-27T03:25:33Z",
+  "updated": "2026-08-27T20:57:26Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1080,6 +1080,30 @@
           },
           {
             "label": "Beta-cap enforcement: the X/10 slot counter was cosmetic only - addAllowedEmail had no cap check, so the form kept accepting new operators past 10 with just an orange banner. Now rejects non-admin invites once BETA_USER_LIMIT (moved to its own src/lib/beta-limit.ts - a \"use server\" file can only export async actions, a plain constant there broke the build) is reached; admins are excluded from the cap. Deliberately a code-level limit requiring a redeploy to raise, not a UI toggle",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "why-page",
+        "title": "/why page - the founder's note",
+        "status": "done",
+        "summary": "Direct maintainer request: a bottom-left, About-style link stating why droppdd was built, what makes it effective, the confidence that comes from being a real user, and a way to contact the maintainer. Content deliberately reuses the already-approved beta-invite email voice rather than drafting something new.",
+        "steps": [
+          {
+            "label": "New public /why route, excluded from the auth gate same as /legal/* - reachable without signing in",
+            "status": "done"
+          },
+          {
+            "label": "Entry points: desktop sidebar bottom-left (next to TERMINATE SESSION, visible regardless of auth state) and a matching icon in the mobile header - deliberately not added to the already-dense mobile bottom tab bar (8-9 icons), same precedent as sign-out's earlier move out of that bar",
+            "status": "done"
+          },
+          {
+            "label": "Contact link is a plain mailto: to the existing admin address - no new feedback infrastructure built, wasn't the ask",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to droppdd-prod, verified live: /why returns 200 unauthenticated, / still 307s, visually confirmed on the real public domain (no dev-mode-badge artifact seen locally, since that only exists in next dev, not the production build)",
             "status": "done"
           }
         ]
