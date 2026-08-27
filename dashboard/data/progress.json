@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-27T20:57:26Z",
+  "updated": "2026-08-27T21:24:49Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1104,6 +1104,38 @@
           },
           {
             "label": "Deployed to droppdd-prod, verified live: /why returns 200 unauthenticated, / still 307s, visually confirmed on the real public domain (no dev-mode-badge artifact seen locally, since that only exists in next dev, not the production build)",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "feedback-board",
+        "title": "Self-serve feedback board (bugs, feature requests, discovery)",
+        "status": "done",
+        "summary": "Prompted by a realization mid-conversation while planning Reddit outreach: there was no real answer to \"how do testers give feedback\" beyond the /why mailto link. Built a kanban-style board (NEW/PLANNED/IN_PROGRESS/DONE columns) covering bugs, feature requests, and discovery notes in one place - any signed-in operator can submit a card; status moves and deletion are admin-only.",
+        "steps": [
+          {
+            "label": "New BoardItem model (type + status as plain strings with documented allowed values, matching Wager's existing pattern - sqlite has no native Prisma enums) - purely additive migration, read directly before applying to prod",
+            "status": "done"
+          },
+          {
+            "label": "New /board route, gated same as every other page - open submission for any signed-in operator, since the whole point was closing the feedback gap, not curating it",
+            "status": "done"
+          },
+          {
+            "label": "Status moves and deletion admin-only (reused checkAdmin()) - a tester can flag something, only the maintainer decides where it stands",
+            "status": "done"
+          },
+          {
+            "label": "Static 4-column kanban (no drag-and-drop) - a deliberate scope call, proportional for a 10-person beta rather than pulling in a DnD library",
+            "status": "done"
+          },
+          {
+            "label": "Added BOARD to the main nav - flagged honestly: mobile bottom tab bar is now at 9-10 icons, the densest it's been. Not addressed here; a mobile-nav audit is separate future work",
+            "status": "done"
+          },
+          {
+            "label": "Full click-through actually performed locally before shipping - created, moved, and deleted a real card, not just build/lint. Deployed to droppdd-prod with an explicit confirmation before the migration; verified live",
             "status": "done"
           }
         ]
