@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-27T22:47:31Z",
+  "updated": "2026-08-29T21:19:00Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1168,6 +1168,38 @@
           },
           {
             "label": "Real functional round-trip test performed on the live production site (not just build/lint): both entry points - pantry-driven and macro-driven, including grocery-list generation - generated real recipes via Claude, passed the existing Zod schema, and rendered correctly",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "recipe-width-fix",
+        "title": "Fix: AI-generated recipe rendered in a narrow strip",
+        "status": "done",
+        "summary": "First real bug filed on the new feedback board, by the maintainer. Generated recipes rendered inside the same 1/3-width AI-panel column as the input form - cramped and hard to read. Fixed by lifting generation state up so the result renders full-width, directly above the static meal catalog, instead of squeezed into the sidebar.",
+        "steps": [
+          {
+            "label": "Split AiMealPlanner.tsx into MealsInteractive.tsx - a Server Component (page.tsx) can't hold the generatedMeal/isLoading/error state, so it now just fetches meals and passes them down as a prop while the client component owns the full interactive layout",
+            "status": "done"
+          },
+          {
+            "label": "Result, loading skeleton, and error panel all moved to a full-width zone above the static catalog grid - the AI panel's own column is now form-only",
+            "status": "done"
+          },
+          {
+            "label": "Old AiMealPlanner.tsx deleted (confirmed via grep it was only ever imported from meals/page.tsx first) rather than left dangling",
+            "status": "done"
+          },
+          {
+            "label": "No markup rewritten from scratch - every card/section is the same JSX relocated, a layout fix not a redesign",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to droppdd-prod and verified with a real generation on the live site (not just build/lint) - confirmed the result now renders full-width directly below the page header, above the static list",
+            "status": "done"
+          },
+          {
+            "label": "Closed the loop: moved the bug card to DONE on the feedback board itself, proving the board->fix->close cycle works end to end",
             "status": "done"
           }
         ]
