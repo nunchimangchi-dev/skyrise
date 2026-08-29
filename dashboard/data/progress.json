@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-29T21:19:00Z",
+  "updated": "2026-08-29T23:42:17Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1203,6 +1203,46 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "attack-and-checkin-redesign",
+        "title": "The Attack + redesigned Check-In (Strength/Movement/Eating)",
+        "status": "done",
+        "summary": "Started as \"add no-gym-required to the pitch\" and turned into a real product redesign once the claim didn't hold up against the actual catalog (3 of 4 existing workouts needed a barbell, kettlebell, or assault bike). New mental model: Attack (what to do - a fixed, gym-free prescription) + Meals (what to eat) + Check-In (did you comply) + Progress. Worked through as a design conversation - streak definition, rest-day mechanics, DB-backed vs hardcoded, route naming - before any code, then built end to end.",
+        "steps": [
+          {
+            "label": "New DailyCheckIn model: 6 self-reported strength booleans (any 3 of 6 = Strength met), movementMet, eatingMet, restDay. Deliberately boolean/self-report today (\"don't paint us into a corner\") - the same booleans a future real pedometer/HealthKit integration would also set, so self-report now doesn't block automation later. WeightRecord untouched; weight logging now optional",
+            "status": "done"
+          },
+          {
+            "label": "Streak redefined: consecutive days where Strength + Movement + Eating are ALL met, or a claimed Rest Day - stricter than the old \"any check-in counts\" rule, confirmed explicitly since it also feeds STREAK_TARGET wagers. Recomputed from full history on every submission rather than incrementally maintained, avoiding same-day-correction edge cases entirely",
+            "status": "done"
+          },
+          {
+            "label": "Rest Day: a floating once-every-7-days pass, not tied to a fixed calendar day - eligibility re-verified server-side in takeRestDay, not just hidden client-side",
+            "status": "done"
+          },
+          {
+            "label": "/workouts renamed to /attack and re-scoped from a browsable 4-workout catalog to a single fixed reference page - Strength Protocol stays DB-backed and admin-editable (reused the existing Workout/Exercise tables and /admin/workouts CRUD rather than rebuilding), Movement Protocol is static guideline copy since step goals aren't exercise-shaped data",
+            "status": "done"
+          },
+          {
+            "label": "/workouts/[id] and WorkoutTracker.tsx deleted outright - no per-workout detail page anymore, which also retires the long-tracked gap where set-completion never persisted (see decisions log)",
+            "status": "done"
+          },
+          {
+            "label": "Catalog content replaced via a safe, idempotent one-off script (prisma/replace-workouts-with-attack-protocol.ts) - deletes the 4 old workouts by known id, not a blanket wipe, matching the add-vegetarian-meal.ts precedent rather than touching seed.ts",
+            "status": "done"
+          },
+          {
+            "label": "Real bug caught by the live click-through test, not the build: unchecked checkboxes return null from formData.get(), and Zod's .optional() alone rejects null - every real submission (anything with an unchecked box) was failing validation. Fixed with .nullable(), then re-verified with a second full live pass, checking the actual database row directly rather than trusting the UI",
+            "status": "done"
+          },
+          {
+            "label": "AI assist on Attack (\"I only have dumbbells, what should I skip?\") noted as a real next feature, deliberately not built in this pass - same treatment the AI meal planner got as its own phase",
+            "status": "todo"
+          }
+        ]
       }
     ]
   },
@@ -1404,6 +1444,10 @@
     {
       "title": "Real-money wager phases dropped from the roadmap, not deferred",
       "why": "Came up during an App Store feasibility discussion - real money would drag droppdd into Apple's strict, inconsistent gambling-review stance on peer-vs-peer stakes if it ever went native. But the deciding factor was independent of App Store concerns: the maintainer's own lived experience is that people motivated enough to game a real-money fitness stake will just settle up outside the app anyway - a workaround he ran himself for years against Fitbit's own step-based incentives. The legal/compliance cost of building real custody-adjacent payment flows buys less real enforcement than it looks like on paper. docs/FUTURE-WAGERS.md updated to mark phases 3-4 dropped; the free honor-system peer wager (phases 1-2, both already shipped) is now the permanent shape of this feature. Also surfaced two longer-horizon product wishes in the same conversation: push notifications (streak reminders, wager-opponent check-ins) as the near-term next step, and Apple Health/Fitness integration further out - both future work, not scheduled."
+    },
+    {
+      "title": "A marketing-copy request turned into a real product redesign, not a copy edit",
+      "why": "Asked to add \"no gym membership required\" to droppdd's pitch. Checking the actual live workout catalog first (rather than just writing the line) found 3 of 4 workouts required a barbell, kettlebell, or assault bike - the claim would have been false the moment a real tester opened Attack. Rather than either skip the claim or fudge it, worked through a real redesign with the maintainer: a new home-equipment-only Strength Protocol, a broader \"Movement\" concept (any 10k-step-equivalent activity, not just walking), and a stricter all-three-areas streak definition - discussed and confirmed piece by piece (self-report vs real tracking, replace-vs-keep the old catalog, DB-backed vs hardcoded, route rename) before any code was written. Ends with skyrise's own long-running practice: verify a claim against reality before it goes out, even an internal one."
     }
   ]
 }
