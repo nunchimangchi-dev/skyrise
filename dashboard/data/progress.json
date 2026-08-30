@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-30T17:43:31Z",
+  "updated": "2026-08-30T21:02:01Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1320,6 +1320,18 @@
           },
           {
             "label": "npm ci, ran replace-workouts-with-attack-protocol.ts (staging still had the old 4-workout catalog), rebuilt, restarted, verified live over the public Tailscale URL",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "raise-beta-cap",
+        "title": "Raise beta cap 10 -> 33",
+        "status": "done",
+        "summary": "Ahead of a planned push for outside distribution (X/build-in-public, plus a Discord community to double as a testing pipeline). One constant (BETA_USER_LIMIT in src/lib/beta-limit.ts), two call sites, no other changes needed.",
+        "steps": [
+          {
+            "label": "Deployed to both droppdd-prod and droppdd-staging, service restarted on each, verified source constant matches on both hosts",
             "status": "done"
           }
         ]
