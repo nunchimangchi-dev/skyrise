@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-30T02:10:51Z",
+  "updated": "2026-08-30T17:33:31Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1265,6 +1265,30 @@
           {
             "label": "Verified live on prod, all three paths: challenging by an existing member's own email correctly resolved to that member (hit self-challenge, proving the lookup found them); challenging by a genuinely unregistered email correctly showed the invite panel pre-filled with that exact email; challenging by a non-email fake callsign preserved the original unprefilled behavior",
             "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "health-endpoint",
+        "title": "Add /api/health endpoint for uptime monitoring",
+        "status": "done",
+        "summary": "Requested by network-ops-02: the homelab Blackbox Exporter monitoring stack was flagging droppdd-staging DOWN because it probed the root URL, which 307-redirects to a Tailscale-only signin address the monitoring host cannot follow. Added a plain unauthenticated GET returning 200 {\"status\":\"ok\"} instead.",
+        "steps": [
+          {
+            "label": "Added src/app/api/health/route.ts - no auth check, no DB query, minimal liveness surface",
+            "status": "done"
+          },
+          {
+            "label": "Built, linted, and smoke-tested locally (curl -> 200 {\"status\":\"ok\"}) before deploying",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to droppdd-prod: merged, rebuilt, restarted; verified 200 over the public URL (https://droppdd.alwaysgivealwaysget.com/api/health)",
+            "status": "done"
+          },
+          {
+            "label": "droppdd-staging deploy blocked by a pre-existing SSH permission gap (unrelated, hit before) - staging still on the Blackbox redirect-accepted workaround until resolved",
+            "status": "pending"
           }
         ]
       }
