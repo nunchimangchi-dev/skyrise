@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-30T17:33:31Z",
+  "updated": "2026-08-30T17:43:31Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1287,8 +1287,40 @@
             "status": "done"
           },
           {
-            "label": "droppdd-staging deploy blocked by a pre-existing SSH permission gap (unrelated, hit before) - staging still on the Blackbox redirect-accepted workaround until resolved",
-            "status": "pending"
+            "label": "droppdd-staging deploy completed after fixing the underlying SSH access gap (see health-endpoint-staging-ssh-fix phase)",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "staging-ssh-fix-and-catchup",
+        "title": "Fix droppdd-staging SSH access, catch it up to main",
+        "status": "done",
+        "summary": "Diagnosed why droppdd-staging rejected my key: unlike prod/unbrokerrdd (Tailscale SSH browser-check auth), staging never had Tailscale SSH enabled, so it fell through to plain OpenSSH with no authorized key. Fixed via Proxmox console access (pveopti, VMID 102). Fixing it surfaced a bigger gap: staging was ~30 commits and 9 migrations behind main.",
+        "steps": [
+          {
+            "label": "Diagnosed root cause via verbose SSH: key offered, rejected - never authorized on staging, unlike prod which uses Tailscale SSH auth instead of a local key",
+            "status": "done"
+          },
+          {
+            "label": "Confirmed with user before trusting pveopti (a never-before-seen Tailscale peer) as a Proxmox console path in",
+            "status": "done"
+          },
+          {
+            "label": "Enabled Tailscale SSH on the staging LXC (pct exec 102 -- tailscale set --ssh) from the Proxmox host, matching prod auth model",
+            "status": "done"
+          },
+          {
+            "label": "Discovered staging was ~30 commits/9 migrations behind main - confirmed with user before doing a full catch-up rather than just the health endpoint",
+            "status": "done"
+          },
+          {
+            "label": "Read all 9 pending migrations in full before running - confirmed all additive (new tables/columns or SQLite RedefineTable pattern), confirmed with user before running prisma migrate deploy",
+            "status": "done"
+          },
+          {
+            "label": "npm ci, ran replace-workouts-with-attack-protocol.ts (staging still had the old 4-workout catalog), rebuilt, restarted, verified live over the public Tailscale URL",
+            "status": "done"
           }
         ]
       }
