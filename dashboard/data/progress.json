@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-29T23:42:17Z",
+  "updated": "2026-08-30T02:10:51Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1241,6 +1241,30 @@
           {
             "label": "AI assist on Attack (\"I only have dumbbells, what should I skip?\") noted as a real next feature, deliberately not built in this pass - same treatment the AI meal planner got as its own phase",
             "status": "todo"
+          }
+        ]
+      },
+      {
+        "id": "wager-challenge-by-email",
+        "title": "Wager challenge accepts email, not just callsign",
+        "status": "done",
+        "summary": "Discussed as a UX question before building, same pattern as the invite-request feature it extends. Real friction: you usually know a friend's email, not the exact callsign they picked - especially if they haven't joined yet.",
+        "steps": [
+          {
+            "label": "Lookup order in createWager: exact username match first (unchanged), then - only if the input is email-shaped - an existing member's email. Covers a case broader than just inviting non-members: a real member whose callsign you don't remember. No ambiguity between the two lookup types since usernames are alphanumeric/underscore only and can never contain @",
+            "status": "done"
+          },
+          {
+            "label": "Only when genuinely nobody matches does the invite panel appear - now carrying the actual email through (challengeEmail param) so it arrives pre-filled instead of asking the user to retype what they just typed",
+            "status": "done"
+          },
+          {
+            "label": "Deliberately skipped a second always-visible \"invite\" button next to Send Challenge (a real alternative discussed) - once the one field does this, a second control doing almost the same thing adds a decision point without adding real capability",
+            "status": "done"
+          },
+          {
+            "label": "Verified live on prod, all three paths: challenging by an existing member's own email correctly resolved to that member (hit self-challenge, proving the lookup found them); challenging by a genuinely unregistered email correctly showed the invite panel pre-filled with that exact email; challenging by a non-email fake callsign preserved the original unprefilled behavior",
+            "status": "done"
           }
         ]
       }
