@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-30T21:02:01Z",
+  "updated": "2026-09-01T12:15:15Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1541,5 +1541,34 @@
       "title": "A marketing-copy request turned into a real product redesign, not a copy edit",
       "why": "Asked to add \"no gym membership required\" to droppdd's pitch. Checking the actual live workout catalog first (rather than just writing the line) found 3 of 4 workouts required a barbell, kettlebell, or assault bike - the claim would have been false the moment a real tester opened Attack. Rather than either skip the claim or fudge it, worked through a real redesign with the maintainer: a new home-equipment-only Strength Protocol, a broader \"Movement\" concept (any 10k-step-equivalent activity, not just walking), and a stricter all-three-areas streak definition - discussed and confirmed piece by piece (self-report vs real tracking, replace-vs-keep the old catalog, DB-backed vs hardcoded, route rename) before any code was written. Ends with skyrise's own long-running practice: verify a claim against reality before it goes out, even an internal one."
     }
-  ]
+  ],
+  "kali-pi-kit": {
+    "repo": "https://github.com/nunchimangchi-dev/kali-pi-kit",
+    "phases": [
+      {
+        "id": "initial-build",
+        "title": "Raspberry Pi 3B+ security/pentesting kit build",
+        "status": "done",
+        "summary": "Built by the builder session (kali-pi-kit project). Kali tooling on a Debian/Raspberry Pi OS base, not Kali's own Pi image - that image has a real unresolved boot bug on this hardware. README documents the full build process and every real gotcha hit along the way.",
+        "steps": [
+          {
+            "label": "Working scripts: image capture/clone with heavy safety guardrails, base image setup, touchscreen driver, per-unit QA",
+            "status": "done"
+          },
+          {
+            "label": "case-studies.md working through real-world security scenarios against the kit's actual hardware",
+            "status": "done"
+          },
+          {
+            "label": "Git set up following this project's documented conventions (read docs/DECISIONS.md directly rather than assuming) - GitHub noreply email, interactive gh auth login",
+            "status": "done"
+          },
+          {
+            "label": "Repo kept private (not the usual public default) - deliberate call, discussed with the user first: documents injection-capable hardware and attack methodology (Metasploit/Reaver/Wifite/Burp Suite, Evil Twin/skimmer/tracker detection) - legitimate defensive/educational content but a materially different risk profile than infra/dotfiles work. Can flip public later once framing is thought through.",
+            "status": "done"
+          }
+        ]
+      }
+    ]
+  }
 }
