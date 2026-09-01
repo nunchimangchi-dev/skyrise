@@ -11,7 +11,7 @@
   "hosts": [
     {
       "name": "box",
-      "role": "CachyOS Linux homelab server",
+      "role": "CachyOS Linux home infrastructure server",
       "status": "in-progress"
     },
     {
@@ -42,8 +42,8 @@
   ],
   "phases": [
     {
-      "id": "homelab-hosting",
-      "title": "Homelab web hosting (Proxmox + OPNsense + Cloudflare Tunnel)",
+      "id": "home-infra-hosting",
+      "title": "Home infrastructure web hosting (Proxmox + OPNsense + Cloudflare Tunnel)",
       "status": "done",
       "summary": "Turning a Proxmox host behind OPNsense into a self-hosted replacement for a VPS/cloud web server - Tailscale-connected, an isolated LXC webserver, all public exposure through Cloudflare Tunnel with zero port-forwarding. Same \"real, demonstrable infrastructure\" thread as the rest of this project, not a toy.",
       "steps": [
@@ -1272,7 +1272,7 @@
         "id": "health-endpoint",
         "title": "Add /api/health endpoint for uptime monitoring",
         "status": "done",
-        "summary": "Requested by network-ops-02: the homelab Blackbox Exporter monitoring stack was flagging droppdd-staging DOWN because it probed the root URL, which 307-redirects to a Tailscale-only signin address the monitoring host cannot follow. Added a plain unauthenticated GET returning 200 {\"status\":\"ok\"} instead.",
+        "summary": "Requested by network-ops-02: the home infrastructure Blackbox Exporter monitoring stack was flagging droppdd-staging DOWN because it probed the root URL, which 307-redirects to a Tailscale-only signin address the monitoring host cannot follow. Added a plain unauthenticated GET returning 200 {\"status\":\"ok\"} instead.",
         "steps": [
           {
             "label": "Added src/app/api/health/route.ts - no auth check, no DB query, minimal liveness surface",
@@ -1450,7 +1450,7 @@
       "why": "Full bootstrap run (packages, git/gh identity, chezmoi dotfiles, tmux+tpm, fisher) plus the account-level shell switch — all confirmed with the user directly at each consequential step (dotfiles diff review, killing a pre-existing unrelated tmux session, the sudo/chsh commands run by the user themselves, never by an agent)."
     },
     {
-      "title": "Homelab web server exposed only via Cloudflare Tunnel, never port-forwarded",
+      "title": "Home infrastructure web server exposed only via Cloudflare Tunnel, never port-forwarded",
       "why": "No inbound firewall holes on the OPNsense edge for a personal project — the tunnel connector makes an outbound-only connection, so there's nothing for a scanner to find regardless of what's running behind it."
     },
     {
