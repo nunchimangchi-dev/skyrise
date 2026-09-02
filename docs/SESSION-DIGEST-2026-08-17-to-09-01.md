@@ -270,6 +270,8 @@ Things that were genuinely left hanging when the session died:
    answered but never actioned.
 7. **Mac `gh auth login`** for the career-ops repo needed re-running (invalid
    stored token) — may be stale by now; verify before relying on it.
-8. **Phase 2 of Pitch's comms board** (on-demand write server, `board/` folder,
-   15-min idle auto-stop, commit-per-move + batch-push) — designed with
-   skyrise input, not yet built by Pitch as of the last message.
+8. **Pitch's comms board** (`board/` folder, on-demand write server, 15-min
+   idle auto-stop, single allowlisted `/api/move` write path, typed confirm
+   on the `approved` transition, commit-per-move + batch-push) — designed
+   with skyrise input. RESOLVED 2026-09-02: Phase 1 (readable board) and
+   Phase 2 (drag-to-advance server) both built and pushed to the pitch repo.
