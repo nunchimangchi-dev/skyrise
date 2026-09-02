@@ -65,7 +65,7 @@ function phaseCardHTML(p, i) {
 }
 
 function render(data) {
-  const { meta, hosts, phases, decisions, updated, droppdd, unbrokerrdd, "career-ops": careerOps } = data;
+  const { meta, hosts, phases, decisions, updated, droppdd, unbrokerrdd, "career-ops": careerOps, pitch } = data;
   const { done, total } = countSteps(phases);
   const pct = total ? Math.round((done / total) * 100) : 0;
   const phasesDone = phases.filter((p) => p.status === "done").length;
@@ -130,6 +130,15 @@ function render(data) {
     const careerOpsRepoLink = document.querySelector("#career-ops-repo-link");
     careerOpsRepoLink.href = careerOps.repo;
     careerOpsRepoLink.textContent = careerOps.repo.replace("https://", "");
+  }
+
+  if (pitch) {
+    document.querySelector(".pitch-phase-list").innerHTML = pitch.phases
+      .map((p, i) => phaseCardHTML(p, `pitch-${i}`))
+      .join("");
+    const pitchRepoLink = document.querySelector("#pitch-repo-link");
+    pitchRepoLink.href = pitch.repo;
+    pitchRepoLink.textContent = pitch.repo.replace("https://", "");
   }
 
   document.querySelectorAll(".phase-card").forEach((card) => {

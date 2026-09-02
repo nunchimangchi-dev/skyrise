@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-01T12:15:15Z",
+  "updated": "2026-09-02T17:03:41Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1565,6 +1565,27 @@
           },
           {
             "label": "Repo kept private (not the usual public default) - deliberate call, discussed with the user first: documents injection-capable hardware and attack methodology (Metasploit/Reaver/Wifite/Burp Suite, Evil Twin/skimmer/tracker detection) - legitimate defensive/educational content but a materially different risk profile than infra/dotfiles work. Can flip public later once framing is thought through.",
+            "status": "done"
+          }
+        ]
+      }
+    ]
+  },
+  "pitch": {
+    "repo": "https://github.com/nunchimangchi-dev/pitch",
+    "phases": [
+      {
+        "id": "comms-board",
+        "title": "Comms board tooling",
+        "status": "done",
+        "summary": "External-communications tracking board, owned by the pitch session (private repo). skyrise's only involvement was the scaffolding decisions - folder layout, on-demand server pattern, push behaviour. No campaign copy, calendar, or strategy is tracked here.",
+        "steps": [
+          {
+            "label": "Readable board: board.json as source of truth, render.mjs generates board/index.html + BOARD.md, published as a private Artifact",
+            "status": "done"
+          },
+          {
+            "label": "On-demand control server (board/serve.mjs): localhost + tailnet bind, 15-min idle auto-stop, one allowlisted stage-transition write path, typed confirm to approve, batch push",
             "status": "done"
           }
         ]
