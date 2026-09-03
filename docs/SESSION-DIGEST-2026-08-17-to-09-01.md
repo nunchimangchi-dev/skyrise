@@ -1,11 +1,12 @@
-# Session digest: 2026-08-17 → 2026-09-01
+# Session digest: 2026-08-17 → 2026-09-03
 
-Distilled from the ~2-week "skyrise" marathon session (transcript
-`f00f7c72-690d-4dcb-b884-8c6f1773eda1.jsonl`, ~31.8k entries, 6 context
-compactions) after it froze and terminated on 2026-09-01. This captures what
-isn't already in `progress.json`, `docs/DECISIONS.md`, droppdd's `HANDOFF.md`,
-or the memory files — the working method, the landmines, and the threads that
-were still open when it died.
+Sections 1–8: distilled from the ~2-week "skyrise" marathon session
+(transcript `f00f7c72-690d-4dcb-b884-8c6f1773eda1.jsonl`, ~31.8k entries,
+6 context compactions) after it froze and terminated on 2026-09-01.
+Section 9: the continuation session that recovered from that crash and kept
+going (2026-09-01 → 09-03). This captures what isn't already in
+`progress.json`, `docs/DECISIONS.md`, droppdd's `HANDOFF.md`, or the memory
+files — the working method, the landmines, and the open threads.
 
 Canonical state still lives in those other files. This is the connective tissue.
 
@@ -178,6 +179,17 @@ not just what got built.
 - **`pveopti` is root-on-the-hypervisor access.** Used it (with user
   confirmation of the host's legitimacy) to `pct exec` Tailscale SSH onto
   `droppdd-staging`. High privilege — scope narrowly, don't make it routine.
+  (`Bash(ssh root@pveopti:*)` was added to the global allowlist 2026-09-03
+  during the outage recovery below — kept, per the user.)
+- **The VLAN20 app LXCs are 1 GB RAM — an on-box `next build` OOM-wedges
+  them.** ct103 (droppdd-prod) runs the app fine on ~200 MB but a
+  from-scratch `next build` (Next 16 + Turbopack) blew past 1 GB and
+  thrashed the container unresponsive — a ~20 min prod outage on 2026-09-03.
+  Before any on-box build, check `pct config <vmid> | grep memory`; if ~1024,
+  `pct set <vmid> -memory 3072 -swap 1024` first and build with
+  `NODE_OPTIONS="--max-old-space-size=2048"`. ct103 is now 3 GB
+  (persisted). ct102/104 are likely still 1 GB.
+  (`vlan20_lxc_build_oom.md`)
 - **Gemini CLI can hang 30+ min with zero tool calls**, surviving model
   switches. After 2–3 stalls on one prompt, stop retrying and build from the
   spec directly. droppdd features from peer-wagers onward were built directly,
@@ -244,18 +256,20 @@ infrastructure" — just "infrastructure" / "the stack". See `never_say_homelab.
 
 Things that were genuinely left hanging when the session died:
 
-1. **Pre-launch / beta-launch strategy was never answered.** The user asked
-   (2026-08-26, right before a compaction): *"What should the user story and
-   experience look like before the website is even visited or the beta link
-   has even been clicked? What are best practices and how do we launch this
-   beta?"* — compaction ate it, the next window opened on a different topic,
-   and it was never returned to. There is no beta-launch doc in droppdd. This
-   is now partly Pitch's territory (strategy/calendar) but the pre-signin
-   experience and Cloudflare Access gating are skyrise execution concerns.
-2. **Two onboarding-audit items deferred by the user, still open:**
-   (a) the Cloudflare Access allowlist decision — whether/when to open it
-   beyond the owner; (b) a "look around before onboarding" read-only browse
-   mode.
+1. **Pre-launch / beta-launch strategy.** The user asked (2026-08-26, before
+   a compaction): *"What should the user story and experience look like
+   before the website is even visited or the beta link has even been
+   clicked? What are best practices and how do we launch this beta?"* — it
+   was lost to compaction and never answered. PARTLY ADDRESSED 2026-09-03:
+   Pitch now owns the channel plan, and the biggest concrete blocker (no
+   self-serve on-ramp — a cold visitor hit a Google-login wall with no way
+   to ask in) is fixed by `/request-access` (§9). Still no written
+   beta-launch doc; still open: a current shareable demo asset (the
+   screenshot set is a week stale) and the Discord server.
+2. **Two onboarding-audit items deferred by the user:** (a) the Cloudflare
+   Access allowlist decision — less pressing now that `/request-access` is
+   the on-ramp regardless of Access state; (b) a "look around before
+   onboarding" read-only browse mode — still open.
 3. **droppdd-prod's `GEMINI_API_KEY` shares box's own CLI key** — deliberate
    speed tradeoff, flagged for a dedicated key. Note the meal-planning swap to
    Claude may have narrowed what still depends on it — worth re-checking what
@@ -265,9 +279,10 @@ Things that were genuinely left hanging when the session died:
    abs — where does this fit?") — named as a real future feature, not built.
 5. **`deepmerge-ts` CVE** in droppdd's lockfile — surfaced by an unrelated
    `npm install`, deliberately left out of scope, flagged for separate work.
-6. **Discord server structure + X posting cadence** — offered to help draft,
-   never picked up. Discord *installation* on this host was asked about and
-   answered but never actioned.
+6. **Discord server** — still not set up (no server, no invite link). Pitch
+   owns X/Reddit/Discord *strategy* now; the Discord server *setup itself*
+   is skyrise execution and remains undone. This is the top remaining gap
+   for any droppdd growth channel.
 7. **Mac `gh auth login`** for the career-ops repo needed re-running (invalid
    stored token) — may be stale by now; verify before relying on it.
 8. **Pitch's comms board** (`board/` folder, on-demand write server, 15-min
@@ -275,3 +290,70 @@ Things that were genuinely left hanging when the session died:
    on the `approved` transition, commit-per-move + batch-push) — designed
    with skyrise input. RESOLVED 2026-09-02: Phase 1 (readable board) and
    Phase 2 (drag-to-advance server) both built and pushed to the pitch repo.
+
+---
+
+## 9. Continuation session (2026-09-01 → 09-03)
+
+This session recovered from the crash above and kept working. Highlights
+not already in `progress.json` / `HANDOFF.md` / memory:
+
+**Recovery + housekeeping**
+- Rebuilt context from repo + memory + git + a briefing from Pitch. Wrote
+  this digest (§1–8).
+- Beta fill count re-verified against prod: **still 1 / 33** (1 non-admin
+  allowlisted, 1 user connected + onboarded, 0 pending invite requests, 1
+  wager, 3 check-ins). `droppdd/docs/OUTREACH-LOG.md` denominator corrected
+  10 → 33.
+- `pitch` added to the dashboard as a minimal entry (private repo; no
+  campaign content, scaffolding note only).
+
+**Permissions overhaul** (`permissions_setup.md`)
+- Global `~/.claude/settings.json` given a "Balanced" allow list (~99 rules:
+  git inspection + normal writes + push, read tools, `npm run build/lint/ci`,
+  `tailscale`/`gh` reads, `jq`/`python3 -c`, ssh to the app hosts) + a small
+  deny list (`sudo`, force-push, `rm -rf /`). Anything not listed still
+  prompts (`npx prisma migrate*`, `curl`, `npm install <pkg>`, etc.).
+- **Root cause of the `git push` blocks:** a stale `autoMode.environment`
+  block in the *global* settings described the `pitch` repo and asserted
+  "this repo is never pushed" — the classifier acted on that everywhere.
+  Cleared it. If classifier behaviour ever seems to act on wrong project
+  context, check that key first.
+- `Bash(ssh root@pveopti:*)` added 09-03 during the outage recovery; kept.
+
+**droppdd features shipped to prod** (both verified end-to-end)
+- **`/request-access`** — public, Turnstile-gated self-serve beta requests,
+  feeding the existing `/admin` invite queue (still a manual human approve,
+  no auto-provision, no email sent). `InviteRequest` schema: `invitedById`
+  nullable + `source` (`self_request` | `peer_wager`). Layered defense:
+  honeypot → Zod → Cloudflare Turnstile (canonical fail-closed siteverify:
+  `success` + `action` + hostname allowlist) → dedupe with no enumeration →
+  rolling-hour cap. Linked from `/signin`, `/auth-error` (AccessDenied), and
+  `/why`. Turnstile widget created via the Cloudflare MCP (`challenges/widgets`,
+  managed, `no_clearance`); public sitekey baked into `src/lib/turnstile.ts`,
+  secret only in each env's `.env`. Local dev uses CF's always-passes test
+  keypair (the code relaxes the action/hostname checks *only* for that
+  known test secret).
+- **AI meal-planning spend cap** — new `AiMealGeneration` meter table (one
+  row per attempt that reaches the paid Anthropic call), `AI_MEAL_DAILY_PER_USER
+  = 15` / `AI_MEAL_DAILY_GLOBAL = 250` in `src/lib/ai-limits.ts`, UTC-day
+  reset. Was cost-unbounded before (only a 60s cooldown).
+- Both migrations are additive; deployed to staging then prod together
+  under one migration confirm.
+
+**Prod outage (2026-09-03, ~20 min)** — see §4. The prod-deploy `next build`
+OOM-wedged the 1 GB `droppdd-prod` LXC. Recovered via `pveopti`: raised
+ct103 to 3 GB, rebooted, rebuilt with a Node heap cap, restarted. No data
+loss (migrations had already applied; additive). Landmine + procedure now
+in §4 and `vlan20_lxc_build_oom.md`.
+
+**Misc**
+- `shush` (macOS pre-call "quiet the machine" script from the career-coach
+  session) saved into `dotfiles/dot_local/bin/executable_shush`,
+  chezmoi-managed, macOS-guarded via a new `dotfiles/.chezmoiignore`.
+  Rationale in `DECISIONS.md`. Purpose: confidence going into a call that
+  nothing local is lurking (camera/mic held by Zoom, a notification
+  mid-share, a resource hog).
+
+**Cross-session ecosystem note:** `network-ops-02` → renamed `ops`;
+`career-coach` bridge is still one-way (relay replies via file/paste).
