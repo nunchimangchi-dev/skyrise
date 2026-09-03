@@ -338,8 +338,20 @@ not already in `progress.json` / `HANDOFF.md` / memory:
   row per attempt that reaches the paid Anthropic call), `AI_MEAL_DAILY_PER_USER
   = 15` / `AI_MEAL_DAILY_GLOBAL = 250` in `src/lib/ai-limits.ts`, UTC-day
   reset. Was cost-unbounded before (only a 60s cooldown).
-- Both migrations are additive; deployed to staging then prod together
-  under one migration confirm.
+- **Eating personas** — `Progress.persona` (`KETO` / `OMAD` / `CALORIE` /
+  `KETO_OMAD`, existing users default `KETO_OMAD`) + optional free-text
+  `eatingTargetNote`. Drives *only* the daily "Eating" check-in prompt;
+  Strength, Movement, streak math, wagers, leaderboard untouched. No
+  number-logging — one self-reported checkbox per persona. The broadening
+  from "OMAD + keto" was reviewed with Pitch first; **both sessions
+  independently landed on the same guardrails** (persona 3 stays y/n or
+  gets cut; persona 4 is a content proof story, not the outreach lead).
+  The umbrella tagline + persona-4 narrative are Warren + Pitch's separate
+  copy workstream — not touched here. Pitch's key point: the beta is empty
+  because ~nobody's been asked, not because the pitch is narrow — so
+  recruiting is the unblock, this is a parallel refinement.
+- All migrations additive; each deployed staging → prod under a migration
+  confirm.
 
 **Prod outage (2026-09-03, ~20 min)** — see §4. The prod-deploy `next build`
 OOM-wedged the 1 GB `droppdd-prod` LXC. Recovered via `pveopti`: raised
