@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# shush — quiet the machine before a call
+#
+# Purpose: walk into a meeting or screen-share confident that nothing on
+# this Mac is lurking or running that could cause a bad experience — a
+# camera/mic still held by Zoom, a notification popping mid-share, a
+# background app hogging resources. Graceful-quits the usual suspects (via
+# osascript, so they save state and release the camera/mic), waits, then
+# force-kills any lingering helper processes.
+#
+# macOS only. chezmoi-managed via skyrise -> ~/.local/bin/shush on darwin,
+# skipped on other hosts (see dotfiles/.chezmoiignore). ~/.local/bin is
+# already on PATH via config.fish.
+#
+# Personal Chrome and Firefox are deliberately NOT in the list so they
+# survive — only the Chrome-for-Testing instance Claude drives is quit.
+set -uo pipefail
+APPS=(
+  "Dropbox"
+  "zoom.us"
+  "Gemini"
+  "Slack"
+  "Spotify"
+  "Google Chrome for Testing"   # the browser Claude drives
+)
+for app in "${APPS[@]}"; do
+  if osascript -e "application \"$app\" is running" 2>/dev/null | grep -q true; then
+    echo "quitting $app"
+    osascript -e "tell application \"$app\" to quit" 2>/dev/null || true
+  fi
+done
+sleep 3
+for pat in Dropbox zoom CptHost caphost Gemini; do
+  pkill -f "$pat" 2>/dev/null || true
+done
+echo "shush: clear. camera and mic are free."

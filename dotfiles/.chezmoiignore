@@ -1,0 +1,6 @@
+{{/* Entries here are skipped by `chezmoi apply`, evaluated as a template. */}}
+
+{{/* shush is macOS-only (osascript). Don't materialize it on other hosts. */}}
+{{- if ne .chezmoi.os "darwin" }}
+.local/bin/shush
+{{- end }}

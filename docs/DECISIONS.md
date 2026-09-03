@@ -47,3 +47,14 @@ dashboard systemd --user service, tailscale serve, and tmux-continuum's
 boot-restore of the pre-reboot `main` session (two windows, correct cwds) all
 came back with zero manual intervention. Persistence claims don't count until
 they've survived an actual reboot, not just a detach/reattach.
+
+## `shush` — pre-call machine-quieting script (macOS)
+
+Going into a meeting or screen-share, you want confidence that nothing
+local is lurking: a camera/mic still held by Zoom, a notification about to
+pop mid-share, a background app eating CPU. `shush` (chezmoi-managed,
+`~/.local/bin/shush`, macOS only via `.chezmoiignore`) graceful-quits the
+usual suspects — Zoom, Slack, Dropbox, Spotify, Gemini, and the
+Chrome-for-Testing instance Claude drives — so they save state and free
+the camera/mic, then force-kills any lingering helpers. Personal Chrome
+and Firefox are left running on purpose.
