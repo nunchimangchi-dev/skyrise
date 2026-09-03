@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-03T14:48:26Z",
+  "updated": "2026-09-03T16:13:21Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1383,6 +1383,34 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "eating-personas",
+        "title": "Eating personas (KETO / OMAD / CALORIE / KETO_OMAD)",
+        "status": "done",
+        "summary": "droppdd was billed as OMAD+keto, which screens out people who'd get value from the actual product (the accountability loop + wagers, all method-agnostic). Persona is chosen at onboarding and drives ONLY the daily 'Eating' check-in prompt plus an optional free-text target reminder. Deliberately contained - Strength, Movement, streak math (three booleans), wagers and leaderboard are untouched. No number-logging: 'hit your target today?' stays one self-reported checkbox for every persona, which is what keeps droppdd from becoming a food diary. Reviewed with the Pitch session first; the marketing/positioning copy is a separate parallel workstream (Warren + Pitch).",
+        "steps": [
+          {
+            "label": "Progress.persona (default KETO_OMAD for back-compat) + optional eatingTargetNote; additive SQLite migration, the 1 existing prod user picks up the correct KETO_OMAD default",
+            "status": "done"
+          },
+          {
+            "label": "src/lib/personas.ts: the four personas with per-persona check-in prompts; onboarding gets a 'YOUR APPROACH' picker, profile can change it later",
+            "status": "done"
+          },
+          {
+            "label": "Check-in 'Eating' label becomes the persona's prompt + shows the target note; checkin.ts streak logic unchanged",
+            "status": "done"
+          },
+          {
+            "label": "Verified end-to-end locally (onboarding CALORIE -> check-in prompt -> profile edit to KETO_OMAD) and on prod (existing user shows the KETO_OMAD prompt); deployed staging then prod",
+            "status": "done"
+          },
+          {
+            "label": "Fast-follow noted: AI meal planner still prompts as a keto/OMAD chef regardless of persona - wiring persona + a calorie target into it is separate",
+            "status": "todo"
+          }
+        ]
       }
     ]
   },
@@ -1592,6 +1620,10 @@
     {
       "title": "droppdd-prod LXC was 1 GB RAM - a from-scratch next build OOM-wedged it (brief prod outage 2026-09-03)",
       "why": "Deploying the request-access + AI-cap features, the prod build step (rm -rf .next then next build, Next 16 + Turbopack) blew past container 103's 1 GB memory limit, thrashed it unresponsive, and took the public site down for ~20 min. The container ran the app fine on ~200 MB at rest - only building on-box was the problem. Recovered by raising the container to 3 GB via pct set from the pveopti hypervisor, rebooting it, and rebuilding with NODE_OPTIONS=--max-old-space-size=2048. Migrations had already applied cleanly and were additive, so no data was at risk. Lesson: an on-box build needs headroom the running app doesn't; size the container for its heaviest task, not its idle state, or build elsewhere and ship the artifact."
+    },
+    {
+      "title": "droppdd broadens from 'OMAD + keto' to four eating personas - product first, positioning copy later",
+      "why": "The OMAD+keto framing was a methodology filter that screened out people who'd get real value from the accountability loop and wagers (both method-agnostic). Beta is 1/33, so the schema change is cheap now and only gets harder once there's check-in history that assumes one model. Both this session and the Pitch session independently landed on the same guardrails: persona 3 (calorie/macros) stays a single y/n self-report with the number optional - never a food log - or it reopens the MyFitnessPal comparison that /why exists to shut down; and persona 4 (keto+OMAD recomp) is a proof story for content, not the outreach lead. Pitch's sharpest point: the beta is empty because almost nobody has been asked, not because the pitch is narrow - so recruiting is the actual unblock and repositioning is a parallel refinement. The product change shipped here; the umbrella tagline and persona-4 narrative are Warren + Pitch's separate workstream."
     }
   ],
   "kali-pi-kit": {
