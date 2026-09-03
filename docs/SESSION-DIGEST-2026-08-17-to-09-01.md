@@ -346,10 +346,19 @@ not already in `progress.json` / `HANDOFF.md` / memory:
   from "OMAD + keto" was reviewed with Pitch first; **both sessions
   independently landed on the same guardrails** (persona 3 stays y/n or
   gets cut; persona 4 is a content proof story, not the outreach lead).
-  The umbrella tagline + persona-4 narrative are Warren + Pitch's separate
-  copy workstream — not touched here. Pitch's key point: the beta is empty
-  because ~nobody's been asked, not because the pitch is narrow — so
-  recruiting is the unblock, this is a parallel refinement.
+  Pitch's key point: the beta is empty because ~nobody's been asked, not
+  because the pitch is narrow — so recruiting is the unblock, this is a
+  parallel refinement.
+- **Site copy reposition** (`cd6287e`) — Pitch drafted the replacement
+  `/signin` + `/why` copy for the four personas, Warren approved, skyrise
+  shipped it. New tagline "You already know what to eat. This is for
+  actually doing it." (replaces "Aggressive Fitness & Fasting" / "NO
+  EXCUSES…"); `/signin` grid now leads with the loop (CHECK-IN / WAGERS /
+  STREAK / LEADERBOARD); `/why` gets a method-neutral insert + explicit
+  "no food diary, no macro math" moat line. Clean split: Pitch owns the
+  words, skyrise ships them. Pitch's "real-money in /why" flag was a
+  misread — the page never said that. AI meal-planner persona-awareness
+  still the outstanding fast-follow.
 - All migrations additive; each deployed staging → prod under a migration
   confirm.
 
