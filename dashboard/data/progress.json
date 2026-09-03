@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-02T17:03:41Z",
+  "updated": "2026-09-03T14:48:26Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1335,6 +1335,54 @@
             "status": "done"
           }
         ]
+      },
+      {
+        "id": "self-serve-request-access",
+        "title": "Self-serve /request-access (Turnstile-gated)",
+        "status": "done",
+        "summary": "Onboarding was 100% manual - every beta user needed an admin to hand-add their email out of band, and a rejected Google login just hit an error page with no way to ask in. That made any growth channel a dead end. New public page feeds the existing /admin invite-request queue; still a human decision, no auto-provisioning.",
+        "steps": [
+          {
+            "label": "InviteRequest schema: invitedById nullable + source field (self_request | peer_wager); additive SQLite migration, 0 rows on prod",
+            "status": "done"
+          },
+          {
+            "label": "Layered abuse defense: hidden honeypot -> Zod -> Cloudflare Turnstile (canonical fail-closed siteverify: success + action + hostname) -> dedupe with no account enumeration -> rolling-hour cap",
+            "status": "done"
+          },
+          {
+            "label": "Turnstile widget created via CF API (managed, no_clearance); secret lives only in each env .env, never committed; localhost uses CF test keys",
+            "status": "done"
+          },
+          {
+            "label": "Linked from /signin, /auth-error (AccessDenied case), /why; admin list shows a source badge and handles the nullable inviter",
+            "status": "done"
+          },
+          {
+            "label": "Verified end-to-end: local, then staging over real HTTPS, then prod with a real Turnstile token (row created, correct source, cleaned up)",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "ai-meal-spend-cap",
+        "title": "Hard daily caps on AI meal generation",
+        "status": "done",
+        "summary": "AI meal planning made real billed Anthropic calls (claude-haiku-4-5) with only a 60s per-user cooldown - no daily or monthly ceiling. Fine at 1 user, a liability once the beta fills or a script calls the action directly.",
+        "steps": [
+          {
+            "label": "New AiMealGeneration meter table (userId, createdAt, indexes) - one row per attempt that reaches the paid call; purely additive migration",
+            "status": "done"
+          },
+          {
+            "label": "AI_MEAL_DAILY_PER_USER = 15, AI_MEAL_DAILY_GLOBAL = 250 (~$3.25/day worst case), reset at UTC midnight; clean 'back after 00:00 UTC' message when the global cap trips",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to staging + prod alongside the request-access feature (one migration confirm for both additive migrations)",
+            "status": "done"
+          }
+        ]
       }
     ]
   },
@@ -1540,6 +1588,10 @@
     {
       "title": "A marketing-copy request turned into a real product redesign, not a copy edit",
       "why": "Asked to add \"no gym membership required\" to droppdd's pitch. Checking the actual live workout catalog first (rather than just writing the line) found 3 of 4 workouts required a barbell, kettlebell, or assault bike - the claim would have been false the moment a real tester opened Attack. Rather than either skip the claim or fudge it, worked through a real redesign with the maintainer: a new home-equipment-only Strength Protocol, a broader \"Movement\" concept (any 10k-step-equivalent activity, not just walking), and a stricter all-three-areas streak definition - discussed and confirmed piece by piece (self-report vs real tracking, replace-vs-keep the old catalog, DB-backed vs hardcoded, route rename) before any code was written. Ends with skyrise's own long-running practice: verify a claim against reality before it goes out, even an internal one."
+    },
+    {
+      "title": "droppdd-prod LXC was 1 GB RAM - a from-scratch next build OOM-wedged it (brief prod outage 2026-09-03)",
+      "why": "Deploying the request-access + AI-cap features, the prod build step (rm -rf .next then next build, Next 16 + Turbopack) blew past container 103's 1 GB memory limit, thrashed it unresponsive, and took the public site down for ~20 min. The container ran the app fine on ~200 MB at rest - only building on-box was the problem. Recovered by raising the container to 3 GB via pct set from the pveopti hypervisor, rebooting it, and rebuilding with NODE_OPTIONS=--max-old-space-size=2048. Migrations had already applied cleanly and were additive, so no data was at risk. Lesson: an on-box build needs headroom the running app doesn't; size the container for its heaviest task, not its idle state, or build elsewhere and ship the artifact."
     }
   ],
   "kali-pi-kit": {
