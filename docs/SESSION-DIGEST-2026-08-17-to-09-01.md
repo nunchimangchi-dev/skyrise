@@ -376,5 +376,16 @@ in §4 and `vlan20_lxc_build_oom.md`.
   nothing local is lurking (camera/mic held by Zoom, a notification
   mid-share, a resource hog).
 
+**Portfolio site refresh** (`nunchimangchi-dev.github.io`, commits
+`fbdd6ea` + `8c92e76`) — full content pass to match career-coach's
+canonical LinkedIn copy: `DATABROKER.deep` → `unbrokerrdd` (card + repo
+"About" description, which was blank), droppdd card rebuilt around
+infrastructure ownership + the added-then-removed Cloudflare Access
+decision + the GDPR/CCPA data-rights flow, skyrise collapsed to a muted
+"supporting project" card, hero reordered, every em/en dash stripped
+(Warren's global rule). Rebased over a stale Aug-27 commit that predated
+the dash rule. Division of labour held: career-coach owns the words and
+did the verification pass, skyrise implemented, Pitch cleared messaging.
+
 **Cross-session ecosystem note:** `network-ops-02` → renamed `ops`;
 `career-coach` bridge is still one-way (relay replies via file/paste).
