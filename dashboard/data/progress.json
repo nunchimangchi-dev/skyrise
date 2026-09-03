@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-03T16:13:21Z",
+  "updated": "2026-09-03T16:50:02Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1409,6 +1409,30 @@
           {
             "label": "Fast-follow noted: AI meal planner still prompts as a keto/OMAD chef regardless of persona - wiring persona + a calorie target into it is separate",
             "status": "todo"
+          }
+        ]
+      },
+      {
+        "id": "site-copy-reposition",
+        "title": "Site copy: four-persona reposition (from Pitch)",
+        "status": "done",
+        "summary": "The product grew to four eating personas but /signin and /why still pitched OMAD/keto only. Pitch drafted the replacement copy, Warren approved it, skyrise implemented it. Copy-only, no schema or logic change. New tagline replaces the fitness-app cliche; the /signin feature grid now leads with the accountability loop (check-in, wagers, streak, leaderboard) instead of workouts/meals; /why keeps its spine with a method-neutral insert and an explicit 'no food diary, no macro math' line. Clean division of labour: Pitch owns the words, skyrise ships them.",
+        "steps": [
+          {
+            "label": "Tagline 'You already know what to eat. This is for actually doing it.' on /signin + browser title; sidebar/mobile chrome -> 'ONE CHECK-IN A DAY'",
+            "status": "done"
+          },
+          {
+            "label": "/signin: method-neutral pitch paragraph; front grid = CHECK-IN / WAGERS / STREAK / LEADERBOARD; softened the leftover 'daily assault' line",
+            "status": "done"
+          },
+          {
+            "label": "/why: method line + explicit moat line + honor-system wager line, page spine kept; /request-access intro de-keto'd",
+            "status": "done"
+          },
+          {
+            "label": "De-dashed every edited surface; deployed staging then prod, verified live",
+            "status": "done"
           }
         ]
       }
