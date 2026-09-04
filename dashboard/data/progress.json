@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-03T16:50:02Z",
+  "updated": "2026-09-04T02:50:00Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -1432,6 +1432,34 @@
           },
           {
             "label": "De-dashed every edited surface; deployed staging then prod, verified live",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "web-analytics-beacon",
+        "title": "Cloudflare Web Analytics beacon",
+        "status": "done",
+        "summary": "A question ('how many real visitors has droppdd had?') had no good answer: the free Cloudflare plan keeps only 24h of per-hostname edge analytics and no RUM beacon was installed. The 24h snapshot was ~800 edge requests / ~5-6 distinct browser IPs with zero bot or health-check traffic at the edge (the blackbox_exporter uptime probes never traverse Cloudflare - they hit the tunnel origin directly), so no filtering was even needed - there just was no history. Added the cookieless Web Analytics beacon to the root layout via next/script so real-visitor pageviews are counted from here on. A dedicated Web Analytics site was created for droppdd.alwaysgivealwaysget.com with auto-install off, so it can't double-count against the zone-level beacon (which is scoped to nunchimangchi.com). One file, +7 lines, no schema/deps/CSP change.",
+        "steps": [
+          {
+            "label": "Pulled the 24h Cloudflare edge analytics for droppdd.alwaysgivealwaysget.com; confirmed all real-browser traffic, no synthetic probe hits at the edge",
+            "status": "done"
+          },
+          {
+            "label": "Created a Web Analytics (RUM) site for the droppdd host, auto_install off - token is a public client-side beacon key",
+            "status": "done"
+          },
+          {
+            "label": "Added <Script strategy=\"afterInteractive\"> for beacon.min.js in src/app/layout.tsx",
+            "status": "done"
+          },
+          {
+            "label": "lint + build clean; local smoke shows the beacon in served HTML",
+            "status": "done"
+          },
+          {
+            "label": "Deployed to prod (no npm ci / no migrate); verified externally - beacon.min.js 200 and the /cdn-cgi/rum POST returns 204 from a real browser",
             "status": "done"
           }
         ]
