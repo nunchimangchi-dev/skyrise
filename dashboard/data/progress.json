@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-04T02:50:00Z",
+  "updated": "2026-09-04T15:55:00Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -37,6 +37,11 @@
     {
       "name": "unbrokerrdd",
       "role": "LXC on Proxmox (VLAN20, isolated) - unbrokerrdd dashboard, public at unbrokerrdd.alwaysgivealwaysget.com",
+      "status": "done"
+    },
+    {
+      "name": "box:7443 (tailscale serve)",
+      "role": "career-ops-dashboard, tailnet-only at https://box.tail2b3f17.ts.net:7443, same as, but separate from, the skyrise dashboard on :443",
       "status": "done"
     }
   ],
@@ -1722,6 +1727,44 @@
           },
           {
             "label": "On-demand control server (board/serve.mjs): localhost + tailnet bind, 15-min idle auto-stop, one allowlisted stage-transition write path, typed confirm to approve, batch push",
+            "status": "done"
+          }
+        ]
+      }
+    ]
+  },
+  "career-ops-dashboard": {
+    "repo": "https://github.com/nunchimangchi-dev/career-ops-dashboard",
+    "summary": "Replaces the old generate-dashboard.mjs / pipeline-dashboard.html (retired by career-coach 2026-09-04 - static, applications.md only, no outreach/follow-up/hard-target data). Warren's ask: one visual he can sit at either the Mac or box and read - where he's failing on outreach, what's actually in flight. Built jointly: career-coach owns the data-layer exporters, Pitch's board/ (their comms-pipeline tracker) supplied the render pattern and the specific lesson to avoid, skyrise owns rendering + hosting.",
+    "phases": [
+      {
+        "id": "v1-build",
+        "title": "v1: needs-attention, funnel, outreach, hard-targets, patterns",
+        "status": "done",
+        "summary": "career-coach's export-dashboard-data.mjs writes five JSON files into the already-Syncthing-synced ~/career-ops-data/dashboard/ - no new sync channel needed. render.mjs reads them and writes a fully static index.html, zero client JS (native <details> only for closed-stage groups and long-note truncation), following Pitch's board/render.mjs pattern - and their specific warning against client-side string templating breaking under strict CSP.",
+        "steps": [
+          {
+            "label": "Needs-attention list: time-sorted (most-overdue-first), reusing follow-ups.json's already-computed urgency/daysUntilNext rather than re-deriving it - a genuinely different pattern from Pitch's stage-based board, not a copy",
+            "status": "done"
+          },
+          {
+            "label": "Application funnel: kanban columns for the active stages, Evaluated (144) and closed stages collapsed to stat summaries instead of rendering 163 cards",
+            "status": "done"
+          },
+          {
+            "label": "Outreach: weekly touch-goal progress bar, DO NOT CONTACT rows structurally excluded from any nudge framing (not just unmentioned) per Warren's explicit instruction in the source data",
+            "status": "done"
+          },
+          {
+            "label": "Hard targets + rejection-pattern analysis (where he's actually failing) sections",
+            "status": "done"
+          },
+          {
+            "label": "index.html gitignored - it bakes in real personal data; the code-only repo is private on GitHub, same split already established for career-ops itself",
+            "status": "done"
+          },
+          {
+            "label": "Hosted on box: systemd --user static server + a 15-min re-render timer, tailnet-only via tailscale serve at :7443 - reachable identically from the Mac or box",
             "status": "done"
           }
         ]
