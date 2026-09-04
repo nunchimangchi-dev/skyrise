@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-04T15:55:00Z",
+  "updated": "2026-09-04T18:35:00Z",
   "meta": {
     "host": "box",
     "host_ip": "192.168.12.200",
@@ -42,6 +42,11 @@
     {
       "name": "box:7443 (tailscale serve)",
       "role": "career-ops-dashboard, tailnet-only at https://box.tail2b3f17.ts.net:7443, same as, but separate from, the skyrise dashboard on :443",
+      "status": "done"
+    },
+    {
+      "name": "dashboard-host",
+      "role": "LXC 107 on Proxmox (VLAN20, isolated) - hosts career-ops-dashboard, own Tailscale identity at dashboard-host.tail2b3f17.ts.net, Syncthing receive-only peer of a narrow dashboard-data-only folder",
       "status": "done"
     }
   ],
@@ -1765,6 +1770,34 @@
           },
           {
             "label": "Hosted on box: systemd --user static server + a 15-min re-render timer, tailnet-only via tailscale serve at :7443 - reachable identically from the Mac or box",
+            "status": "done"
+          }
+        ]
+      },
+      {
+        "id": "dashboard-unspof",
+        "title": "career-ops-dashboard: un-SPOF the dashboard itself",
+        "status": "done",
+        "summary": "Warren connected this back to the prior day's Syncthing/SPOF work directly: the dashboard DATA was properly mesh-synced, but the dashboard APPLICATION (code, generated HTML, hosting, the URL itself) was box-only - same failure shape as the original Mac-only problem, one layer up. Fix: a new small dedicated LXC on Proxmox, matching the established pattern that anything meant to be reliably reachable lives on Proxmox (web01, droppdd-prod, unbrokerrdd, carevault, monitoring), never on the daily-driver machines.",
+        "steps": [
+          {
+            "label": "New LXC 107 (dashboard-host), VLAN20, IPv6 disabled at creation, own dedicated Tailscale identity rather than riding box's tailscale serve port-multiplexing",
+            "status": "done"
+          },
+          {
+            "label": "A second, narrower Syncthing folder (career-ops-dashboard-data) shares only the 5 aggregated dashboard JSON files, receive-only - this LXC never receives cv.md, comp notes, or raw application text, smaller sensitive-data footprint than box/Mac/carevault on the one machine that is reachable 24/7",
+            "status": "done"
+          },
+          {
+            "label": "Code cloned via a read-only GitHub deploy key scoped to just this repo, not broader credentials",
+            "status": "done"
+          },
+          {
+            "label": "Caught and fixed a real permission bug during smoke-testing: /var/lib/syncthing (700) silently blocked the farmer user from reading the synced data, render.mjs's own error handling masked it as an all-zeros render instead of a crash - fixed via group membership + directory permission, verified against the actual unattended systemd path (not just a manual run) before declaring it fixed",
+            "status": "done"
+          },
+          {
+            "label": "Retired box's hosted copy (stopped the service/timer, removed the tailscale serve mapping) once the new host verified clean - one canonical URL, dashboard-host.tail2b3f17.ts.net",
             "status": "done"
           }
         ]
